@@ -3,12 +3,15 @@ import { ClipboardList, Package, Store, FileSpreadsheet, Plus, Pencil, Trash2, H
 import { ACCENT_DARK, DANGER, ProductThumb, StatCard, EmptyState } from '../components/Common'
 import { formatBRL } from '../lib/utils'
 import { criarProduto, atualizarProduto, desativarProduto } from '../lib/produtos'
+import { useIsDesktop } from '../lib/useIsDesktop'
 import ProductForm from './ProductForm'
 
 export default function AdminView({
   orders, clients, produtos, recarregarProdutos, recarregarPedidosEClientes,
   tab, setTab, voltar, exportarCSV, sair,
 }) {
+  const isDesktop = useIsDesktop()
+  const maxWidth = isDesktop ? 1000 : 560
   const [editing, setEditing] = useState(null) // produto sendo editado, ou {} para novo
   const [salvando, setSalvando] = useState(false)
   const [atualizando, setAtualizando] = useState(false)
@@ -58,7 +61,7 @@ export default function AdminView({
   }
 
   return (
-    <div style={{ maxWidth: 560, margin: '0 auto', paddingBottom: 30 }}>
+    <div style={{ maxWidth, margin: '0 auto', paddingBottom: 30 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 16px 4px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <button onClick={voltar} style={{ background: '#fff', border: '1px solid #D7E2F0', borderRadius: 10, width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

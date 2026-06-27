@@ -27,7 +27,7 @@ async function proximoCodigoFiscal() {
 // Cria o pedido completo: garante o cliente, cria o pedido, cria os itens.
 // Devolve o pedido já no formato que o restante do app espera (igual ao
 // que era usado no protótipo, para não precisar mudar as telas).
-export async function criarPedido({ dadosCliente, itensCarrinho, total, pagamento, troco, trocoPara }) {
+export async function criarPedido({ dadosCliente, itensCarrinho, total, pagamento, troco, trocoPara, valorFrete, distanciaKm }) {
   const cliente = await garantirCliente(dadosCliente)
 
   const numeroPedido = await proximoNumeroPedido()
@@ -43,6 +43,8 @@ export async function criarPedido({ dadosCliente, itensCarrinho, total, pagament
       forma_pagamento: pagamento,
       precisa_troco: !!troco,
       troco_para: troco ? trocoPara : null,
+      valor_frete: valorFrete || 0,
+      distancia_km: distanciaKm ?? null,
       total,
       status: 'Recebido',
       impresso: false,
@@ -81,6 +83,8 @@ export async function criarPedido({ dadosCliente, itensCarrinho, total, pagament
     pagamento: pedido.forma_pagamento,
     troco: pedido.precisa_troco,
     trocoPara: pedido.troco_para,
+    valorFrete: Number(pedido.valor_frete || 0),
+    distanciaKm: pedido.distancia_km,
     itens: itensCarrinho.map(i => ({ id: i.id, nome: i.nome, unidade: i.unidade, qty: i.qty, preco: i.preco })),
     total: pedido.total,
     status: pedido.status,
@@ -95,7 +99,7 @@ export async function listarPedidos() {
     .from('pedidos')
     .select(`
       id, numero_pedido, codigo_fiscal, endereco_entrega, forma_pagamento,
-      precisa_troco, troco_para, total, status, impresso, criado_em,
+      precisa_troco, troco_para, valor_frete, distancia_km, total, status, impresso, criado_em,
       clientes ( id, nome, telefone ),
       itens_pedido ( nome_produto, unidade, quantidade, preco_unitario )
     `)
@@ -116,6 +120,8 @@ export async function listarPedidos() {
     pagamento: p.forma_pagamento,
     troco: p.precisa_troco,
     trocoPara: p.troco_para,
+    valorFrete: Number(p.valor_frete || 0),
+    distanciaKm: p.distancia_km,
     itens: p.itens_pedido.map(i => ({
       nome: i.nome_produto, unidade: i.unidade, qty: i.quantidade, preco: Number(i.preco_unitario),
     })),

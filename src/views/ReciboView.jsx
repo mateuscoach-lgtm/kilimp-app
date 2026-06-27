@@ -46,6 +46,10 @@ export default function ReciboView({ order, onImprimir, novoPedido }) {
           </div>
         ))}
         <Dashed />
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+          <span>Entrega{order.distanciaKm ? ` (~${order.distanciaKm} km)` : ''}</span>
+          <span>{order.valorFrete ? formatBRL(order.valorFrete) : 'a combinar'}</span>
+        </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: 14 }}>
           <span>TOTAL</span>
           <span>{formatBRL(order.total)}</span>

@@ -101,10 +101,11 @@ export default function App() {
     setClients(c)
   }
 
-  async function finalizarPedido() {
+  async function finalizarPedido({ valorFrete = 0, distanciaKm = null } = {}) {
     if (!form.nome.trim() || !form.telefone.trim() || !form.endereco.trim()) return
 
     const enderecoCompleto = `${form.endereco}${form.bairro ? ', ' + form.bairro : ''}${form.cidade ? ' - ' + form.cidade : ''}`
+    const totalComFrete = total + valorFrete
 
     try {
       const pedido = await criarPedido({
@@ -117,10 +118,12 @@ export default function App() {
           enderecoCompleto,
         },
         itensCarrinho: cartItems,
-        total,
+        total: totalComFrete,
         pagamento: form.pagamento,
         troco: form.pagamento === 'Dinheiro' && form.troco,
         trocoPara: form.pagamento === 'Dinheiro' && form.troco ? parseFloat(form.trocoPara || 0) : null,
+        valorFrete,
+        distanciaKm,
       })
 
       setLastOrder(pedido)
@@ -174,6 +177,8 @@ export default function App() {
         ::-webkit-scrollbar-thumb { background: #C7D6E8; border-radius: 4px; }
         button { font-family: inherit; cursor: pointer; }
         input, select, textarea { font-family: inherit; }
+        .spin { animation: spin-rotate 0.8s linear infinite; }
+        @keyframes spin-rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       `}</style>
 
       {view === 'loja' && (

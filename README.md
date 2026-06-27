@@ -66,7 +66,38 @@ Essas credenciais estão em `src/lib/utils.js` (constante `ADMIN_CREDENCIAIS`).
 > Isso não é urgente para o volume inicial de uma loja de bairro, mas vale
 > revisitar se o app crescer.
 
-## Estrutura de pastas
+## Frete por distância (novo)
+
+O checkout calcula automaticamente o valor da entrega com base na distância
+em linha reta entre a loja e o endereço do cliente (sem custo, sem chave de
+API — usa o serviço gratuito Nominatim/OpenStreetMap para localizar o
+endereço, e a fórmula de Haversine para calcular a distância).
+
+**Antes de usar em produção, configure em `src/lib/frete.js`:**
+
+1. `LOJA_LATITUDE` e `LOJA_LONGITUDE` — a localização real da Kilimp.
+   Forma fácil de achar: abra o Google Maps, clique com o botão direito
+   exatamente no ponto da loja, e copie os dois números que aparecem.
+2. `FAIXAS_FRETE` — a tabela de preço por faixa de distância. Vem com
+   valores de exemplo; edite livremente.
+
+**Migração de banco necessária:** se você já rodou o `supabase_setup.sql`
+antes desta atualização, é preciso rodar também o
+`supabase_migracao_frete.sql` (adiciona duas colunas novas na tabela
+`pedidos`, sem apagar nada do que já existe).
+
+Se o endereço não for encontrado automaticamente, o cliente pode optar por
+"Combinar na entrega" em vez de travar o pedido.
+
+## Layout para computador (novo)
+
+As telas principais (loja, carrinho, checkout, painel admin) agora se
+adaptam automaticamente para telas grandes — mais colunas de produtos,
+cabeçalho mais espaçoso, formulários mais largos. Isso é feito por CSS
+(hook `useIsDesktop` em `src/lib/useIsDesktop.js`), sem precisar de uma
+versão separada do app.
+
+
 
 ```
 src/
@@ -75,7 +106,9 @@ src/
     produtos.js         → funções de banco: listar/criar/editar produto, upload de foto
     clientes.js         → funções de banco: buscar/criar cliente, resumo de compras
     pedidos.js          → funções de banco: criar pedido completo, listar, atualizar status
+    frete.js            → cálculo de frete por distância (Haversine + geocodificação gratuita)
     utils.js            → formatação, WhatsApp, impressão térmica (ESC/POS)
+    useIsDesktop.js      → hook para detectar tela grande (computador) vs celular
   views/
     LojaView.jsx        → catálogo (tela inicial do cliente)
     CarrinhoView.jsx    → carrinho de compras

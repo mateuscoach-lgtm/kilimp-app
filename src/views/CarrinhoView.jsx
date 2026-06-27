@@ -2,10 +2,14 @@ import React from 'react'
 import { Plus, Minus, Trash2 } from 'lucide-react'
 import { ACCENT, ACCENT_DARK, BG, DANGER, ProductThumb, TopBar } from '../components/Common'
 import { formatBRL } from '../lib/utils'
+import { useIsDesktop } from '../lib/useIsDesktop'
 
 export default function CarrinhoView({ items, total, addToCart, removeFromCart, deleteFromCart, voltar, continuar }) {
+  const isDesktop = useIsDesktop()
+  const maxWidth = isDesktop ? 720 : 520
+
   return (
-    <div style={{ maxWidth: 520, margin: '0 auto', paddingBottom: 100 }}>
+    <div style={{ maxWidth, margin: '0 auto', paddingBottom: 100 }}>
       <TopBar title="Seu carrinho" onBack={voltar} />
       <div style={{ padding: 16 }}>
         {items.length === 0 ? (

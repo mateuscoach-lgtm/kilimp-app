@@ -26,6 +26,7 @@ export function montarMensagemWhatsApp(order) {
     `*Itens:*`,
     ...order.itens.map(i => `- ${i.qty}x ${i.nome} (${i.unidade})`),
     ``,
+    `Entrega: ${order.valorFrete ? formatBRL(order.valorFrete) : 'a combinar'}${order.distanciaKm ? ` (~${order.distanciaKm} km)` : ''}`,
     `Total: ${formatBRL(order.total)}`,
     `Pagamento: ${order.pagamento}${order.troco ? ` — Troco para ${formatBRL(order.trocoPara)}` : ''}`,
   ]
@@ -77,6 +78,7 @@ export function montarComandoESCPOS(order) {
   })
   linhas.push('--------------------------------\n')
   linhas.push(ESC + '!' + '\x10')
+  linhas.push(`Entrega: ${order.valorFrete ? formatBRL(order.valorFrete) : 'a combinar'}${order.distanciaKm ? ` (~${order.distanciaKm} km)` : ''}\n`)
   linhas.push(`TOTAL: ${formatBRL(order.total)}\n`)
   linhas.push(ESC + '!' + '\x00')
   linhas.push(`Pagamento: ${order.pagamento}${order.troco ? ` (troco p/ ${formatBRL(order.trocoPara)})` : ''}\n`)
