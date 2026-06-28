@@ -1,24 +1,36 @@
 import React from 'react'
 import { ArrowLeft } from 'lucide-react'
 
-export const ACCENT = '#1373D6'
-export const ACCENT_DARK = '#0A3D7A'
-export const BG = '#F5F8FC'
+// ============================================================
+// PALETA KILIMP — azul + areia + grafite
+// ============================================================
+export const ACCENT = '#2980B9'       // azul principal (botões, links)
+export const ACCENT_DARK = '#1A5276'  // azul escuro (headers, destaques fortes)
+export const SAND = '#F4F1EA'         // areia de fundo (seções alternadas)
+export const BG = '#FFFFFF'           // branco neutro (fundo principal)
+export const GRAPHITE = '#2C3E50'     // grafite para textos (no lugar do preto puro)
 export const DANGER = '#C9544A'
 
-export function KilimpLogo({ size = 1 }) {
+export const LOGO_URL = '/logo-kilimp.webp'
+
+export function KilimpLogo({ size = 1, height = 40, framed = true }) {
+  const img = (
+    <img
+      src={LOGO_URL}
+      alt="Kilimp — Comércio de Produtos de Limpeza"
+      style={{ height: height * size, width: 'auto', display: 'block' }}
+    />
+  )
+
+  if (!framed) return img
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
-      <div style={{
-        fontFamily: "'Arial Black', Arial, sans-serif", fontWeight: 900, fontSize: 26 * size,
-        color: '#fff', letterSpacing: -0.5, fontStyle: 'italic',
-        textShadow: '0 2px 0 rgba(10,61,122,0.45)', transform: 'skewY(-2deg)',
-      }}>
-        Kilimp
-      </div>
-      <div style={{ fontSize: 9.5 * size, fontWeight: 700, color: 'rgba(255,255,255,0.85)', letterSpacing: 0.6, textTransform: 'uppercase', marginTop: 1 * size }}>
-        Produtos de Limpeza
-      </div>
+    <div style={{
+      background: ACCENT_DARK, borderRadius: 10,
+      padding: `${Math.round(height * size * 0.12)}px ${Math.round(height * size * 0.22)}px`,
+      display: 'inline-flex', alignItems: 'center',
+    }}>
+      {img}
     </div>
   )
 }

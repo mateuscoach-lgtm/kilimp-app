@@ -66,7 +66,27 @@ Essas credenciais estão em `src/lib/utils.js` (constante `ADMIN_CREDENCIAIS`).
 > Isso não é urgente para o volume inicial de uma loja de bairro, mas vale
 > revisitar se o app crescer.
 
-## Cadastro inteligente por telefone (novo)
+## Nova página de recepção (Home) e identidade visual
+
+O app agora abre numa página institucional (`src/views/HomeView.jsx`) antes
+da loja: cabeçalho com menu (Início, Sobre Nós, Contato, Painel
+Administrativo, Carrinho), hero com a logo e CTA "Ver Produtos", seção de
+categorias, seção "Sobre Nós" e rodapé azul institucional com contatos.
+
+A logo oficial está em `public/logo-kilimp.webp` — para trocá-la, basta
+substituir esse arquivo (mantendo o mesmo nome) por uma nova versão.
+
+**Paleta de cores** (em `src/components/Common.jsx`):
+- Azul principal `#2980B9` (`ACCENT`) e azul escuro `#1A5276` (`ACCENT_DARK`)
+- Areia `#F4F1EA` (`SAND`) — fundo de seções alternadas
+- Branco `#FFFFFF` (`BG`) — fundo principal
+- Grafite `#2C3E50` (`GRAPHITE`) — textos, no lugar do preto puro
+
+Para editar o e-mail e texto de localização exibidos no rodapé, veja as
+constantes `EMAIL_LOJA` e `ENDERECO_LOJA_TEXTO` no topo de `HomeView.jsx`
+(mesmos valores também existem em `ContactFooter.jsx`, usado dentro da loja).
+
+
 
 O checkout agora reconhece automaticamente clientes que já compraram antes:
 ao digitar o telefone e sair do campo, o app busca no banco e, se encontrar,

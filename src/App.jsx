@@ -5,6 +5,7 @@ import { listarClientesComResumo } from './lib/clientes'
 import { enviarParaImpressora, abrirWhatsAppPedido, formatBRL } from './lib/utils'
 
 import LojaView from './views/LojaView'
+import HomeView from './views/HomeView'
 import CarrinhoView from './views/CarrinhoView'
 import CheckoutView from './views/CheckoutView'
 import ReciboView from './views/ReciboView'
@@ -12,7 +13,7 @@ import AdminLoginView from './views/AdminLoginView'
 import AdminView from './views/AdminView'
 
 export default function App() {
-  const [view, setView] = useState('loja') // loja | carrinho | checkout | recibo | admin
+  const [view, setView] = useState('home') // home | loja | carrinho | checkout | recibo | admin
   const [cart, setCart] = useState({})
   const [categoria, setCategoria] = useState('Todos')
   const [busca, setBusca] = useState('')
@@ -182,6 +183,16 @@ export default function App() {
         @keyframes spin-rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       `}</style>
 
+      {view === 'home' && (
+        <HomeView
+          categorias={categorias}
+          totalItens={totalItens}
+          irParaProdutos={() => setView('loja')}
+          irParaCarrinho={() => setView('carrinho')}
+          irParaAdmin={() => setView('admin')}
+        />
+      )}
+
       {view === 'loja' && (
         <LojaView
           produtos={produtosFiltrados}
@@ -196,6 +207,7 @@ export default function App() {
           total={total}
           irParaCarrinho={() => setView('carrinho')}
           irParaAdmin={() => setView('admin')}
+          irParaHome={() => setView('home')}
         />
       )}
 

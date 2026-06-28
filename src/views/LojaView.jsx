@@ -1,5 +1,5 @@
 import React from 'react'
-import { ShoppingCart, Plus, Search, Store } from 'lucide-react'
+import { ShoppingCart, Plus, Search, Store, ArrowLeft } from 'lucide-react'
 import { ACCENT, ACCENT_DARK, BG, KilimpLogo, ProductThumb } from '../components/Common'
 import { formatBRL } from '../lib/utils'
 import { useIsDesktop } from '../lib/useIsDesktop'
@@ -7,7 +7,7 @@ import ContactFooter from '../components/ContactFooter'
 
 export default function LojaView({
   produtos, categorias, categoria, setCategoria, busca, setBusca,
-  cart, addToCart, totalItens, total, irParaCarrinho, irParaAdmin,
+  cart, addToCart, totalItens, total, irParaCarrinho, irParaAdmin, irParaHome,
 }) {
   const isDesktop = useIsDesktop()
   const maxWidth = isDesktop ? 1100 : 520
@@ -17,16 +17,23 @@ export default function LojaView({
     <div style={{ maxWidth, margin: '0 auto', paddingBottom: totalItens > 0 ? 92 : 24 }}>
       <div style={{
         background: `linear-gradient(135deg, ${ACCENT} 0%, ${ACCENT_DARK} 100%)`,
-        padding: isDesktop ? '24px 32px 28px' : '20px 18px 24px', color: '#fff',
+        padding: isDesktop ? '20px 32px 28px' : '16px 18px 24px', color: '#fff',
         borderRadius: isDesktop ? '0 0 26px 26px' : '0 0 22px 22px',
-        boxShadow: '0 4px 18px rgba(10,61,122,0.25)',
+        boxShadow: '0 4px 18px rgba(26,82,118,0.25)',
       }}>
         <div style={{
           display: 'flex', justifyContent: 'space-between',
           alignItems: isDesktop ? 'center' : 'flex-start',
           marginBottom: isDesktop ? 20 : 16, gap: 24,
         }}>
-          <KilimpLogo size={isDesktop ? 1.2 : 1} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {irParaHome && (
+              <button onClick={irParaHome} title="Voltar ao início" style={{ background: 'rgba(255,255,255,0.18)', border: 'none', borderRadius: 9, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
+                <ArrowLeft size={16} />
+              </button>
+            )}
+            <KilimpLogo height={isDesktop ? 40 : 32} framed={false} />
+          </div>
           {isDesktop && (
             <div style={{ position: 'relative', flex: 1, maxWidth: 420 }}>
               <Search size={16} style={{ position: 'absolute', left: 14, top: 13, color: '#9FC1E8' }} />
