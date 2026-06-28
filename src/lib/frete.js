@@ -82,17 +82,30 @@ export async function geocodificarEndereco(enderecoTexto) {
   }
 }
 
-// Tenta geocodificar com o endereço completo; se não achar, tenta de novo
-// com uma versão simplificada (só rua + cidade, sem número/bairro), já que
-// o Nominatim às vezes não tem o número exato cadastrado para ruas menores.
-async function geocodificarComFallback(enderecoCompleto, rua, cidade) {
+// Tenta geocodificar em níveis decrescentes de precisão:
+// 1. Endereço completo (rua + número + bairro + cidade)
+// 2. Sem o "de"/conectivos comuns que variam entre o nome oficial e o do OSM
+// 3. Bairro + cidade (sem a rua) — quase sempre existe no mapa, e já dá
+//    uma distância aproximada razoável para fins de frete
+async function geocodificarComFallback(enderecoCompleto, rua, bairro, cidade) {
   const tentativa1 = await geocodificarEndereco(enderecoCompleto)
   if (tentativa1) return tentativa1
 
   if (rua && cidade) {
-    const enderecoSimplificado = `${rua}, ${cidade}, SP, Brasil`
-    console.warn('[Frete] Tentando endereço simplificado:', enderecoSimplificado)
-    return await geocodificarEndereco(enderecoSimplificado)
+    // Remove conectivos comuns ("de", "da", "do") que costumam ser a
+    // diferença entre o nome popular e o nome cadastrado no mapa.
+    const ruaSimplificada = rua.replace(/\b(de|da|do|dos|das)\b/gi, '').replace(/\s+/g, ' ').trim()
+    if (ruaSimplificada !== rua) {
+      const tentativa2 = await geocodificarEndereco(`${ruaSimplificada}, ${cidade}, SP, Brasil`)
+      if (tentativa2) return tentativa2
+    }
+  }
+
+  if (bairro && cidade) {
+    // Última tentativa: só o bairro. Menos preciso (a distância é até o
+    // centro do bairro, não até a casa exata), mas evita travar o pedido.
+    const tentativa3 = await geocodificarEndereco(`${bairro}, ${cidade}, SP, Brasil`)
+    if (tentativa3) return { ...tentativa3, aproximado: true }
   }
 
   return null
@@ -100,10 +113,9 @@ async function geocodificarComFallback(enderecoCompleto, rua, cidade) {
 
 // Função principal: recebe o endereço completo do cliente e devolve
 // o valor do frete + a distância calculada (para mostrar na tela, se quiser).
-// Se não conseguir geocodificar, devolve frete null (o app deve então
-// pedir para o cliente confirmar manualmente, ou usar um valor padrão).
-export async function calcularFrete(enderecoCompleto, rua, cidade) {
-  const coordsCliente = await geocodificarComFallback(enderecoCompleto, rua, cidade)
+// Se não conseguir geocodificar nem pelo bairro, devolve frete null.
+export async function calcularFrete(enderecoCompleto, rua, bairro, cidade) {
+  const coordsCliente = await geocodificarComFallback(enderecoCompleto, rua, bairro, cidade)
 
   if (!coordsCliente) {
     return { distanciaKm: null, valor: null, erro: 'endereco_nao_encontrado' }
@@ -120,5 +132,6 @@ export async function calcularFrete(enderecoCompleto, rua, cidade) {
     distanciaKm: Math.round(distanciaKm * 10) / 10, // 1 casa decimal
     valor: faixa.preco,
     erro: null,
+    aproximado: !!coordsCliente.aproximado,
   }
 }

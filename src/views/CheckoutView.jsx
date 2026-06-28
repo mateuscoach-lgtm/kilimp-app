@@ -33,7 +33,7 @@ export default function CheckoutView({ form, setForm, items, total, voltar, fina
     if (!form.endereco.trim()) return
     setCalculando(true)
     const enderecoCompleto = `${form.endereco}, ${form.bairro || ''} - ${form.cidade || 'Sorocaba'}, SP`
-    const resultado = await calcularFrete(enderecoCompleto, form.endereco, form.cidade || 'Sorocaba')
+    const resultado = await calcularFrete(enderecoCompleto, form.endereco, form.bairro, form.cidade || 'Sorocaba')
     setFrete(resultado)
     setCalculando(false)
   }
@@ -79,12 +79,19 @@ export default function CheckoutView({ form, setForm, items, total, voltar, fina
           )}
 
           {frete && frete.valor !== null && !frete.semCalculo && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#EAF1FB', borderRadius: 10, padding: '10px 12px' }}>
-              <div style={{ fontSize: 12.5, color: '#4A5C70' }}>
-                <MapPin size={13} style={{ marginRight: 4, verticalAlign: -2 }} />
-                Entrega a ~{frete.distanciaKm} km
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#EAF1FB', borderRadius: 10, padding: '10px 12px' }}>
+                <div style={{ fontSize: 12.5, color: '#4A5C70' }}>
+                  <MapPin size={13} style={{ marginRight: 4, verticalAlign: -2 }} />
+                  Entrega a ~{frete.distanciaKm} km
+                </div>
+                <div style={{ fontWeight: 700, fontSize: 14, color: ACCENT_DARK }}>{formatBRL(frete.valor)}</div>
               </div>
-              <div style={{ fontWeight: 700, fontSize: 14, color: ACCENT_DARK }}>{formatBRL(frete.valor)}</div>
+              {frete.aproximado && (
+                <div style={{ fontSize: 11, color: '#9AAAB9', padding: '0 4px' }}>
+                  Cálculo aproximado pelo bairro (endereço exato não localizado no mapa).
+                </div>
+              )}
             </div>
           )}
 
