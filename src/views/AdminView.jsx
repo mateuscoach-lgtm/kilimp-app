@@ -1,10 +1,12 @@
 import React, { useState, useMemo } from 'react'
-import { ClipboardList, Package, Store, FileSpreadsheet, Plus, Pencil, Trash2, Hash, LogOut, ArrowLeft } from 'lucide-react'
+import { ClipboardList, Package, Store, FileSpreadsheet, Plus, Pencil, Trash2, Hash, LogOut, ArrowLeft, Printer, Eye } from 'lucide-react'
 import { ACCENT_DARK, DANGER, ProductThumb, StatCard, EmptyState } from '../components/Common'
 import { formatBRL } from '../lib/utils'
 import { criarProduto, atualizarProduto, desativarProduto } from '../lib/produtos'
 import { useIsDesktop } from '../lib/useIsDesktop'
 import ProductForm from './ProductForm'
+import ReciboModal from './ReciboModal'
+import ClienteModal from './ClienteModal'
 
 export default function AdminView({
   orders, clients, produtos, recarregarProdutos, recarregarPedidosEClientes,
@@ -15,6 +17,8 @@ export default function AdminView({
   const [editing, setEditing] = useState(null) // produto sendo editado, ou {} para novo
   const [salvando, setSalvando] = useState(false)
   const [atualizando, setAtualizando] = useState(false)
+  const [pedidoParaImprimir, setPedidoParaImprimir] = useState(null)
+  const [clienteSelecionado, setClienteSelecionado] = useState(null)
 
   const totalVendas = orders.reduce((s, o) => s + Number(o.total), 0)
   const ticketMedio = orders.length ? totalVendas / orders.length : 0
@@ -132,13 +136,19 @@ export default function AdminView({
                   )}
                   <div style={{ fontSize: 12.5, color: '#4A5C70' }}>{o.cliente} • {o.telefone}</div>
                   <div style={{ fontSize: 11.5, color: '#7C8B9C', marginTop: 2 }}>{o.endereco}</div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: 13 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8, fontSize: 13 }}>
                     <span style={{ color: '#7C8B9C' }}>
                       {o.itens.reduce((s, i) => s + i.qty, 0)} itens • {o.pagamento}
                       {o.troco && ` (troco p/ ${formatBRL(o.trocoPara)})`}
                     </span>
                     <span style={{ fontWeight: 700 }}>{formatBRL(o.total)}</span>
                   </div>
+                  <button
+                    onClick={() => setPedidoParaImprimir(o)}
+                    style={{ marginTop: 8, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: '#EAF1FB', color: ACCENT_DARK, border: 'none', borderRadius: 8, padding: '8px 0', fontSize: 12, fontWeight: 600 }}
+                  >
+                    <Printer size={13} /> Reimprimir
+                  </button>
                 </div>
               ))}
             </div>
@@ -189,6 +199,12 @@ export default function AdminView({
                     <span style={{ color: '#7C8B9C' }}>{c.totalPedidos} pedido(s)</span>
                     <span style={{ fontWeight: 700 }}>{formatBRL(c.totalGasto)}</span>
                   </div>
+                  <button
+                    onClick={() => setClienteSelecionado(c)}
+                    style={{ marginTop: 8, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: '#EAF1FB', color: ACCENT_DARK, border: 'none', borderRadius: 8, padding: '8px 0', fontSize: 12, fontWeight: 600 }}
+                  >
+                    <Eye size={13} /> Consultar / imprimir ficha
+                  </button>
                 </div>
               ))}
             </div>
@@ -224,6 +240,18 @@ export default function AdminView({
           </div>
         )}
       </div>
+
+      {pedidoParaImprimir && (
+        <ReciboModal order={pedidoParaImprimir} onClose={() => setPedidoParaImprimir(null)} />
+      )}
+
+      {clienteSelecionado && (
+        <ClienteModal
+          cliente={clienteSelecionado}
+          pedidosDoCliente={orders.filter(o => o.clienteId === clienteSelecionado.id)}
+          onClose={() => setClienteSelecionado(null)}
+        />
+      )}
     </div>
   )
 }

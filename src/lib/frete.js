@@ -15,8 +15,8 @@
 // Forma fácil de achar: abra google.com/maps, clique com o botão direito
 // exatamente no ponto da loja, e o primeiro número que aparece no menu
 // é a latitude, o segundo é a longitude.
-export const LOJA_LATITUDE = -23.475184
-export const LOJA_LONGITUDE = -47.468306
+export const LOJA_LATITUDE = -23.5015
+export const LOJA_LONGITUDE = -47.4526
 
 // ---------- TABELA DE PREÇO POR FAIXA DE DISTÂNCIA ----------
 // Edite livremente: cada faixa tem uma distância MÁXIMA (em km) e um preço.
@@ -49,19 +49,25 @@ function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
 // Limite de uso justo: no máximo 1 chamada por segundo (mais que
 // suficiente para o volume de uma loja de bairro).
 export async function geocodificarEndereco(enderecoTexto) {
-  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(enderecoTexto)}`
+  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=br&q=${encodeURIComponent(enderecoTexto)}`
 
   try {
     const resposta = await fetch(url, {
       headers: {
-        // O Nominatim pede que cada aplicação se identifique.
         'Accept-Language': 'pt-BR',
       },
     })
+
+    if (!resposta.ok) {
+      console.error('[Frete] Nominatim respondeu com erro HTTP:', resposta.status)
+      return null
+    }
+
     const dados = await resposta.json()
 
     if (!dados || dados.length === 0) {
-      return null // endereço não encontrado
+      console.warn('[Frete] Endereço não encontrado pelo Nominatim:', enderecoTexto)
+      return null
     }
 
     return {
@@ -69,17 +75,35 @@ export async function geocodificarEndereco(enderecoTexto) {
       longitude: parseFloat(dados[0].lon),
     }
   } catch (e) {
-    console.error('Erro ao geocodificar endereço:', e)
+    // Erros aqui costumam ser de rede/CORS. Logamos o detalhe completo
+    // para facilitar o diagnóstico pelo Console do navegador (F12).
+    console.error('[Frete] Erro de rede ao geocodificar endereço:', e)
     return null
   }
+}
+
+// Tenta geocodificar com o endereço completo; se não achar, tenta de novo
+// com uma versão simplificada (só rua + cidade, sem número/bairro), já que
+// o Nominatim às vezes não tem o número exato cadastrado para ruas menores.
+async function geocodificarComFallback(enderecoCompleto, rua, cidade) {
+  const tentativa1 = await geocodificarEndereco(enderecoCompleto)
+  if (tentativa1) return tentativa1
+
+  if (rua && cidade) {
+    const enderecoSimplificado = `${rua}, ${cidade}, SP, Brasil`
+    console.warn('[Frete] Tentando endereço simplificado:', enderecoSimplificado)
+    return await geocodificarEndereco(enderecoSimplificado)
+  }
+
+  return null
 }
 
 // Função principal: recebe o endereço completo do cliente e devolve
 // o valor do frete + a distância calculada (para mostrar na tela, se quiser).
 // Se não conseguir geocodificar, devolve frete null (o app deve então
 // pedir para o cliente confirmar manualmente, ou usar um valor padrão).
-export async function calcularFrete(enderecoCompleto) {
-  const coordsCliente = await geocodificarEndereco(enderecoCompleto)
+export async function calcularFrete(enderecoCompleto, rua, cidade) {
+  const coordsCliente = await geocodificarComFallback(enderecoCompleto, rua, cidade)
 
   if (!coordsCliente) {
     return { distanciaKm: null, valor: null, erro: 'endereco_nao_encontrado' }

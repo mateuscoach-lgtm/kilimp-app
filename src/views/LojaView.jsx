@@ -3,6 +3,7 @@ import { ShoppingCart, Plus, Search, Store } from 'lucide-react'
 import { ACCENT, ACCENT_DARK, BG, KilimpLogo, ProductThumb } from '../components/Common'
 import { formatBRL } from '../lib/utils'
 import { useIsDesktop } from '../lib/useIsDesktop'
+import ContactFooter from '../components/ContactFooter'
 
 export default function LojaView({
   produtos, categorias, categoria, setCategoria, busca, setBusca,
@@ -103,6 +104,8 @@ export default function LojaView({
           </div>
         )}
       </div>
+
+      <ContactFooter isDesktop={isDesktop} />
 
       {totalItens > 0 && (
         <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'center', padding: 12, background: 'linear-gradient(to top, rgba(245,248,252,1) 60%, rgba(245,248,252,0))' }}>

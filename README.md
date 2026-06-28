@@ -89,7 +89,23 @@ antes desta atualização, é preciso rodar também o
 Se o endereço não for encontrado automaticamente, o cliente pode optar por
 "Combinar na entrega" em vez de travar o pedido.
 
-## Layout para computador (novo)
+## Reimpressão e ficha de cliente (novo)
+
+No painel admin, aba **Pedidos**, cada pedido tem um botão **"Reimprimir"**
+que reabre o cupom completo e permite reenviar para a impressora/WhatsApp.
+
+Na aba **Clientes**, cada cliente tem um botão **"Consultar / imprimir
+ficha"**, que mostra os dados completos e o histórico de pedidos, com opção
+de imprimir.
+
+## Rodapé de contatos (novo)
+
+A tela inicial (loja) agora tem, no final da página, três botões de
+contato: WhatsApp, e-mail e localização no mapa. Edite os valores reais em
+`src/components/ContactFooter.jsx` (constantes `EMAIL_LOJA` e
+`ENDERECO_LOJA_TEXTO`).
+
+
 
 As telas principais (loja, carrinho, checkout, painel admin) agora se
 adaptam automaticamente para telas grandes — mais colunas de produtos,

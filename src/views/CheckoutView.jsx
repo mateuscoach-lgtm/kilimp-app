@@ -33,7 +33,7 @@ export default function CheckoutView({ form, setForm, items, total, voltar, fina
     if (!form.endereco.trim()) return
     setCalculando(true)
     const enderecoCompleto = `${form.endereco}, ${form.bairro || ''} - ${form.cidade || 'Sorocaba'}, SP`
-    const resultado = await calcularFrete(enderecoCompleto)
+    const resultado = await calcularFrete(enderecoCompleto, form.endereco, form.cidade || 'Sorocaba')
     setFrete(resultado)
     setCalculando(false)
   }
