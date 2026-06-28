@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
-import { MapPin, Loader2 } from 'lucide-react'
+import { MapPin, Loader2, CheckCircle2 } from 'lucide-react'
 import { ACCENT, ACCENT_DARK, BG, DANGER, Section, Field, TopBar } from '../components/Common'
 import { formatBRL } from '../lib/utils'
 import { useIsDesktop } from '../lib/useIsDesktop'
 import { calcularFrete } from '../lib/frete'
+import { buscarClientePorTelefone } from '../lib/clientes'
 
 export default function CheckoutView({ form, setForm, items, total, voltar, finalizar }) {
   const isDesktop = useIsDesktop()
@@ -12,6 +13,8 @@ export default function CheckoutView({ form, setForm, items, total, voltar, fina
 
   const [frete, setFrete] = useState(null) // { distanciaKm, valor, erro }
   const [calculando, setCalculando] = useState(false)
+  const [buscandoCliente, setBuscandoCliente] = useState(false)
+  const [clienteReconhecido, setClienteReconhecido] = useState(false)
 
   // Só libera confirmar o pedido depois que o frete foi calculado com sucesso
   // (ou o cliente optou por seguir sem cálculo automático, ver handleSemCalculo).
@@ -26,6 +29,35 @@ export default function CheckoutView({ form, setForm, items, total, voltar, fina
     // o frete anterior para evitar cobrar um valor de outro endereço.
     if (field === 'endereco' || field === 'bairro' || field === 'cidade') {
       setFrete(null)
+    }
+    if (field === 'telefone') {
+      setClienteReconhecido(false)
+    }
+  }
+
+  // Disparado quando o cliente termina de digitar o telefone (onBlur).
+  // Se já existir cadastro com esse telefone, pré-preenche os outros campos
+  // automaticamente — assim, da segunda compra em diante, ele praticamente
+  // não precisa digitar nada além do telefone.
+  async function handleTelefoneBlur() {
+    const telefone = form.telefone.trim()
+    if (!telefone || telefone.length < 8) return
+
+    setBuscandoCliente(true)
+    const cliente = await buscarClientePorTelefone(telefone)
+    setBuscandoCliente(false)
+
+    if (cliente) {
+      setForm(prev => ({
+        ...prev,
+        nome: cliente.nome || prev.nome,
+        endereco: cliente.endereco || prev.endereco,
+        complemento: cliente.complemento || prev.complemento,
+        bairro: cliente.bairro || prev.bairro,
+        cidade: cliente.cidade || prev.cidade,
+      }))
+      setClienteReconhecido(true)
+      setFrete(null) // endereço mudou, frete precisa ser recalculado
     }
   }
 
@@ -54,12 +86,27 @@ export default function CheckoutView({ form, setForm, items, total, voltar, fina
       <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
 
         <Section title="Quem vai receber">
+          <Field
+            label="Telefone / WhatsApp"
+            value={form.telefone}
+            onChange={v => update('telefone', v)}
+            onBlur={handleTelefoneBlur}
+            placeholder="(15) 99999-0000"
+          />
+          {buscandoCliente && (
+            <div style={{ fontSize: 11.5, color: '#7C8B9C' }}>Verificando cadastro...</div>
+          )}
+          {clienteReconhecido && !buscandoCliente && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11.5, color: '#1FAE5C', background: '#EAFBF0', borderRadius: 8, padding: '6px 10px' }}>
+              <CheckCircle2 size={13} /> Que bom te ver de novo! Seus dados foram preenchidos automaticamente.
+            </div>
+          )}
           <Field label="Nome completo" value={form.nome} onChange={v => update('nome', v)} placeholder="Ex: Maria Souza" />
-          <Field label="Telefone / WhatsApp" value={form.telefone} onChange={v => update('telefone', v)} placeholder="(15) 99999-0000" />
         </Section>
 
         <Section title="Endereço de entrega">
           <Field label="Rua e número" value={form.endereco} onChange={v => update('endereco', v)} placeholder="Rua das Acácias, 120" />
+          <Field label="Complemento (bloco, apto, ponto de referência)" value={form.complemento} onChange={v => update('complemento', v)} placeholder="Ex: Bloco 2, Apto 34" />
           <Field label="Bairro" value={form.bairro} onChange={v => update('bairro', v)} placeholder="Vila Hortência" />
           <Field label="Cidade" value={form.cidade} onChange={v => update('cidade', v)} placeholder="Sorocaba" />
 

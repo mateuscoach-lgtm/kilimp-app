@@ -43,7 +43,7 @@ export function Section({ title, children }) {
   )
 }
 
-export function Field({ label, value, onChange, placeholder, type = 'text' }) {
+export function Field({ label, value, onChange, placeholder, type = 'text', onBlur }) {
   return (
     <div>
       <label style={{ fontSize: 11.5, color: '#7C8B9C', marginBottom: 4, display: 'block' }}>{label}</label>
@@ -51,6 +51,7 @@ export function Field({ label, value, onChange, placeholder, type = 'text' }) {
         type={type}
         value={value}
         onChange={e => onChange(e.target.value)}
+        onBlur={onBlur}
         placeholder={placeholder}
         style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1px solid #D7E2F0', fontSize: 13.5, outline: 'none' }}
       />

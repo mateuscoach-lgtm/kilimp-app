@@ -23,6 +23,7 @@ export async function criarCliente(dados) {
       nome: dados.nome,
       telefone: dados.telefone,
       endereco: dados.endereco,
+      complemento: dados.complemento || null,
       bairro: dados.bairro,
       cidade: dados.cidade,
     })
@@ -36,11 +37,34 @@ export async function criarCliente(dados) {
   return data
 }
 
-// Garante que o cliente existe: se já tiver cadastro pelo telefone, retorna ele;
-// senão, cria um novo. Usado no momento de finalizar o pedido.
+// Atualiza os dados de um cliente já existente (ex: ele mudou de endereço
+// ou corrigiu o nome numa compra seguinte). Mantém o telefone como chave.
+export async function atualizarCliente(id, dados) {
+  const { data, error } = await supabase
+    .from('clientes')
+    .update({
+      nome: dados.nome,
+      endereco: dados.endereco,
+      complemento: dados.complemento || null,
+      bairro: dados.bairro,
+      cidade: dados.cidade,
+    })
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Erro ao atualizar cliente:', error)
+    throw error
+  }
+  return data
+}
+
+// Garante que o cliente existe: se já tiver cadastro pelo telefone, atualiza
+// os dados (caso tenham mudado) e retorna; senão, cria um novo.
 export async function garantirCliente(dados) {
   const existente = await buscarClientePorTelefone(dados.telefone)
-  if (existente) return existente
+  if (existente) return atualizarCliente(existente.id, dados)
   return criarCliente(dados)
 }
 

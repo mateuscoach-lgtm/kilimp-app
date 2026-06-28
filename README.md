@@ -66,7 +66,21 @@ Essas credenciais estão em `src/lib/utils.js` (constante `ADMIN_CREDENCIAIS`).
 > Isso não é urgente para o volume inicial de uma loja de bairro, mas vale
 > revisitar se o app crescer.
 
-## Frete por distância (novo)
+## Cadastro inteligente por telefone (novo)
+
+O checkout agora reconhece automaticamente clientes que já compraram antes:
+ao digitar o telefone e sair do campo, o app busca no banco e, se encontrar,
+pré-preenche nome, endereço, complemento, bairro e cidade — sem precisar de
+login ou senha. Da segunda compra em diante, o cliente só digita o telefone.
+
+Também foi adicionado o campo **Complemento** (bloco, apartamento, ponto de
+referência), útil para quem mora em condomínio.
+
+**Migração de banco necessária:** se você já rodou o `supabase_setup.sql`
+antes desta atualização, rode também `supabase_migracao_complemento.sql`
+(adiciona a coluna nova na tabela `clientes`, sem apagar nada).
+
+
 
 O checkout calcula automaticamente o valor da entrega com base na distância
 em linha reta entre a loja e o endereço do cliente (sem custo, sem chave de

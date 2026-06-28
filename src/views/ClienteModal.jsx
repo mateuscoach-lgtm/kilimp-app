@@ -31,6 +31,7 @@ export default function ClienteModal({ cliente, pedidosDoCliente, onClose }) {
           <div style={{ fontWeight: 800, fontSize: 16, color: ACCENT_DARK, marginBottom: 8 }}>{cliente.nome}</div>
           <Row label="Telefone" value={cliente.telefone} />
           <Row label="Endereço" value={cliente.endereco} wrap />
+          {cliente.complemento && <Row label="Complemento" value={cliente.complemento} wrap />}
           <Row label="Bairro" value={cliente.bairro || '—'} />
           <Row label="Cidade" value={cliente.cidade || '—'} />
           <Row label="Cliente desde" value={new Date(cliente.criado_em || cliente.criadoEm).toLocaleDateString('pt-BR')} />

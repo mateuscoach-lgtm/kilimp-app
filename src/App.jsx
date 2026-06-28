@@ -25,7 +25,7 @@ export default function App() {
   const [adminAutenticado, setAdminAutenticado] = useState(false)
 
   const [form, setForm] = useState({
-    nome: '', telefone: '', endereco: '', bairro: '', cidade: 'Sorocaba',
+    nome: '', telefone: '', endereco: '', complemento: '', bairro: '', cidade: 'Sorocaba',
     pagamento: 'Pix', troco: false, trocoPara: '',
   })
 
@@ -104,7 +104,7 @@ export default function App() {
   async function finalizarPedido({ valorFrete = 0, distanciaKm = null } = {}) {
     if (!form.nome.trim() || !form.telefone.trim() || !form.endereco.trim()) return
 
-    const enderecoCompleto = `${form.endereco}${form.bairro ? ', ' + form.bairro : ''}${form.cidade ? ' - ' + form.cidade : ''}`
+    const enderecoCompleto = `${form.endereco}${form.complemento ? ' - ' + form.complemento : ''}${form.bairro ? ', ' + form.bairro : ''}${form.cidade ? ' - ' + form.cidade : ''}`
     const totalComFrete = total + valorFrete
 
     try {
@@ -113,6 +113,7 @@ export default function App() {
           nome: form.nome,
           telefone: form.telefone,
           endereco: form.endereco,
+          complemento: form.complemento,
           bairro: form.bairro,
           cidade: form.cidade,
           enderecoCompleto,
