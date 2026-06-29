@@ -165,14 +165,14 @@ export default function App() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F5F8FC', fontFamily: 'Inter, system-ui, sans-serif' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FAF7F0', fontFamily: 'Inter, system-ui, sans-serif' }}>
         <div style={{ color: '#0A3D7A', fontSize: 14, fontWeight: 600 }}>Carregando…</div>
       </div>
     )
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F5F8FC', fontFamily: 'Inter, system-ui, -apple-system, sans-serif', color: '#15202B' }}>
+    <div style={{ minHeight: '100vh', background: '#FAF7F0', fontFamily: 'Inter, system-ui, -apple-system, sans-serif', color: '#2C3E50' }}>
       <style>{`
         * { box-sizing: border-box; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }

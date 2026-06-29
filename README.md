@@ -69,17 +69,25 @@ Essas credenciais estão em `src/lib/utils.js` (constante `ADMIN_CREDENCIAIS`).
 ## Nova página de recepção (Home) e identidade visual
 
 O app agora abre numa página institucional (`src/views/HomeView.jsx`) antes
-da loja: cabeçalho com menu (Início, Sobre Nós, Contato, Painel
-Administrativo, Carrinho), hero com a logo e CTA "Ver Produtos", seção de
-categorias, seção "Sobre Nós" e rodapé azul institucional com contatos.
+da loja: cabeçalho **azul sólido** com menu (Início, Produtos, Categorias,
+Sobre Nós, Contato, Painel Administrativo, Carrinho), hero com a logo e CTA
+"Ver Produtos", seção de categorias com ícones outline sobre fundo areia,
+seção "Sobre Nós" e rodapé azul institucional com contatos.
 
-A logo oficial está em `public/logo-kilimp.webp` — para trocá-la, basta
-substituir esse arquivo (mantendo o mesmo nome) por uma nova versão.
+**A logo "Kilimp" foi recriada como tipografia real** (componente
+`KilimpLogo` em `src/components/Common.jsx`), não como arquivo de imagem —
+isso permite que ela se adapte a qualquer fundo (azul ou claro) sem nunca
+aparecer como um "retângulo colado". Usa a fonte Poppins (carregada via
+Google Fonts no `index.html`) em itálico-bold, com uma gota SVG ao lado.
+
+Para trocar o texto/estilo da logo, edite a função `KilimpLogo` em
+`Common.jsx`. O parâmetro `variant` controla a cor: `"light"` (branco, para
+fundos azuis) ou `"dark"` (azul escuro, para fundos claros).
 
 **Paleta de cores** (em `src/components/Common.jsx`):
 - Azul principal `#2980B9` (`ACCENT`) e azul escuro `#1A5276` (`ACCENT_DARK`)
-- Areia `#F4F1EA` (`SAND`) — fundo de seções alternadas
-- Branco `#FFFFFF` (`BG`) — fundo principal
+- Areia `#F4F1EA` (`SAND`) — fundo de seções alternadas (categorias)
+- Areia clara `#FAF7F0` (`BG`) — fundo principal da loja e da Home
 - Grafite `#2C3E50` (`GRAPHITE`) — textos, no lugar do preto puro
 
 Para editar o e-mail e texto de localização exibidos no rodapé, veja as

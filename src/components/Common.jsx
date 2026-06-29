@@ -7,30 +7,46 @@ import { ArrowLeft } from 'lucide-react'
 export const ACCENT = '#2980B9'       // azul principal (botões, links)
 export const ACCENT_DARK = '#1A5276'  // azul escuro (headers, destaques fortes)
 export const SAND = '#F4F1EA'         // areia de fundo (seções alternadas)
-export const BG = '#FFFFFF'           // branco neutro (fundo principal)
+export const SAND_WARM = '#EDE6D6'    // areia mais quente, para o fundo principal da loja
+export const BG = '#FAF7F0'           // fundo principal levemente areia (não branco puro)
 export const GRAPHITE = '#2C3E50'     // grafite para textos (no lugar do preto puro)
 export const DANGER = '#C9544A'
 
-export const LOGO_URL = '/logo-kilimp.webp'
-
-export function KilimpLogo({ size = 1, height = 40, framed = true }) {
-  const img = (
-    <img
-      src={LOGO_URL}
-      alt="Kilimp — Comércio de Produtos de Limpeza"
-      style={{ height: height * size, width: 'auto', display: 'block' }}
-    />
-  )
-
-  if (!framed) return img
+// Wordmark "Kilimp" recriado como tipografia real (não imagem), para se
+// adaptar perfeitamente a qualquer fundo — header azul, hero, ou áreas claras.
+// `variant="light"` = texto branco (usar sobre fundo azul)
+// `variant="dark"`  = texto azul escuro (usar sobre fundo claro/areia)
+export function KilimpLogo({ size = 1, height = 40, variant = 'light', showTagline = false }) {
+  const color = variant === 'light' ? '#FFFFFF' : ACCENT_DARK
+  const dropColor = variant === 'light' ? '#FFFFFF' : ACCENT
+  const fontSize = height * size * 0.74
 
   return (
-    <div style={{
-      background: ACCENT_DARK, borderRadius: 10,
-      padding: `${Math.round(height * size * 0.12)}px ${Math.round(height * size * 0.22)}px`,
-      display: 'inline-flex', alignItems: 'center',
-    }}>
-      {img}
+    <div style={{ display: 'inline-flex', flexDirection: 'column', lineHeight: 1 }}>
+      <div style={{ display: 'inline-flex', alignItems: 'center', gap: fontSize * 0.06 }}>
+        <span style={{
+          fontFamily: "'Poppins', 'Segoe UI', Arial, sans-serif",
+          fontWeight: 800, fontSize, color, letterSpacing: -0.5, whiteSpace: 'nowrap',
+          fontStyle: 'italic', transform: 'skewY(-1.5deg)', display: 'inline-block',
+        }}>
+          Kilimp
+        </span>
+        <svg width={fontSize * 0.26} height={fontSize * 0.38} viewBox="0 0 24 32" style={{ flexShrink: 0, marginLeft: 1 }}>
+          <path
+            d="M12 1C12 1 3 14 3 21a9 9 0 0018 0C21 14 12 1 12 1z"
+            fill={dropColor}
+            opacity={variant === 'light' ? 0.95 : 1}
+          />
+        </svg>
+      </div>
+      {showTagline && (
+        <span style={{
+          fontSize: fontSize * 0.19, fontWeight: 600, letterSpacing: 1.1, textTransform: 'uppercase',
+          color: variant === 'light' ? 'rgba(255,255,255,0.85)' : '#5A6470', marginTop: fontSize * 0.08,
+        }}>
+          Produtos de Limpeza
+        </span>
+      )}
     </div>
   )
 }
