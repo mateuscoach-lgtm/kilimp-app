@@ -22,7 +22,7 @@ export default function App() {
   const [produtos, setProdutos] = useState([])
   const [lastOrder, setLastOrder] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [adminTab, setAdminTab] = useState('pedidos')
+  const [adminTab, setAdminTab] = useState('painel')
   const [adminAutenticado, setAdminAutenticado] = useState(false)
 
   const [form, setForm] = useState({

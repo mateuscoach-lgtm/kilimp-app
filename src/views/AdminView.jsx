@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { ClipboardList, Package, Store, FileSpreadsheet, Plus, Pencil, Trash2, Hash, LogOut, ArrowLeft, Printer, Eye } from 'lucide-react'
+import { ClipboardList, Package, Store, FileSpreadsheet, Plus, Pencil, Trash2, Hash, LogOut, ArrowLeft, Printer, Eye, Kanban } from 'lucide-react'
 import { ACCENT_DARK, DANGER, ProductThumb, StatCard, EmptyState } from '../components/Common'
 import { formatBRL } from '../lib/utils'
 import { criarProduto, atualizarProduto, desativarProduto } from '../lib/produtos'
@@ -7,6 +7,7 @@ import { useIsDesktop } from '../lib/useIsDesktop'
 import ProductForm from './ProductForm'
 import ReciboModal from './ReciboModal'
 import ClienteModal from './ClienteModal'
+import KanbanView from './KanbanView'
 
 export default function AdminView({
   orders, clients, produtos, recarregarProdutos, recarregarPedidosEClientes,
@@ -80,6 +81,7 @@ export default function AdminView({
 
       <div style={{ display: 'flex', gap: 8, padding: '12px 16px 0', overflowX: 'auto' }}>
         {[
+          { key: 'painel', label: 'Painel', icon: Kanban },
           { key: 'pedidos', label: 'Pedidos', icon: ClipboardList },
           { key: 'produtos', label: 'Produtos', icon: Package },
           { key: 'clientes', label: 'Clientes', icon: Store },
@@ -108,7 +110,7 @@ export default function AdminView({
           <StatCard label="Ticket médio" value={formatBRL(ticketMedio)} small />
         </div>
 
-        {(tab === 'pedidos' || tab === 'clientes') && (
+        {(tab === 'painel' || tab === 'pedidos' || tab === 'clientes') && (
           <button
             onClick={handleAtualizar}
             disabled={atualizando}
@@ -116,6 +118,10 @@ export default function AdminView({
           >
             {atualizando ? 'Atualizando...' : '↻ Atualizar lista'}
           </button>
+        )}
+
+        {tab === 'painel' && (
+          <KanbanView orders={orders} recarregarPedidosEClientes={recarregarPedidosEClientes} />
         )}
 
         {tab === 'pedidos' && (
