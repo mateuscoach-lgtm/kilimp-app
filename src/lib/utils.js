@@ -1,9 +1,10 @@
 // ============================================================
 // CONFIGURAÇÃO DA LOJA
 // ============================================================
-// MVP: usuário/senha fixos só para manter o painel fora do alcance do
-// cliente comum. Antes de crescer mais: migrar para Supabase Auth.
-export const ADMIN_CREDENCIAIS = { usuario: 'kilimp', senha: 'kilimp2026' }
+// O login do painel admin agora usa Supabase Auth de verdade (e-mail +
+// senha gerenciados pelo próprio Supabase), em vez de credenciais fixas
+// no código. Ver supabase_migracao_auth_seguranca.sql para criar o
+// usuário administrador e as políticas de segurança correspondentes.
 
 export const WHATSAPP_LOJA = import.meta.env.VITE_WHATSAPP_LOJA || '5515997735531'
 
@@ -42,6 +43,47 @@ export function abrirWhatsAppPedido(order) {
   // pode nascer fora da área visível da tela ("fora de área"). Com
   // location.href o WhatsApp abre na mesma aba/contexto, de forma mais
   // previsível tanto no computador quanto no celular.
+  window.location.href = url
+}
+
+// Formata uma data ISO ("AAAA-MM-DD") para o formato falado em
+// português, ex: "quinta-feira, 3 de julho".
+function formatarDataFalada(dataISO) {
+  const data = new Date(dataISO + 'T00:00:00')
+  return data.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
+}
+
+// Monta a mensagem de previsão de entrega, enviada PARA O CLIENTE (não
+// para a loja, ao contrário de montarMensagemWhatsApp). Usada no painel,
+// aba Painel/Kanban, quando o admin define ou altera a data prevista.
+export function montarMensagemPrevisaoEntrega(order) {
+  const dataFalada = formatarDataFalada(order.previsaoEntrega)
+  const linhas = [
+    `Olá, ${order.cliente}! Aqui é da Kilimp. 🧴`,
+    ``,
+    `Seu pedido ${order.id} está confirmado e a previsão de entrega é para *${dataFalada}*.`,
+    ``,
+    `Qualquer dúvida, é só responder por aqui. Obrigado pela preferência!`,
+  ]
+  return linhas.join('\n')
+}
+
+// Abre o WhatsApp com a mensagem de previsão de entrega já pronta,
+// direcionada ao TELEFONE DO CLIENTE (e não ao número da loja). O envio
+// final continua dependendo de um clique humano em "Enviar" dentro do
+// WhatsApp — não existe forma de mandar mensagens de WhatsApp 100%
+// automáticas sem a API oficial paga da Meta (ver nota no README).
+export function avisarClientePrevisaoEntrega(order) {
+  if (!order.previsaoEntrega) return
+  let telefoneLimpo = (order.telefone || '').replace(/\D/g, '')
+  if (!telefoneLimpo) return
+  // O campo de telefone no checkout pede só DDD + número (ex: (15) 99999-0000),
+  // sem o DDI 55. Mas, por segurança, se o cliente excepcionalmente já tiver
+  // digitado o 55 na frente (telefone com 12-13 dígitos começando com 55),
+  // evitamos duplicar o prefixo.
+  const jaTemDDI = telefoneLimpo.length >= 12 && telefoneLimpo.startsWith('55')
+  const texto = encodeURIComponent(montarMensagemPrevisaoEntrega(order))
+  const url = `https://wa.me/${jaTemDDI ? '' : '55'}${telefoneLimpo}?text=${texto}`
   window.location.href = url
 }
 

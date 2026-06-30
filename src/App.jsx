@@ -3,6 +3,7 @@ import { listarProdutos } from './lib/produtos'
 import { criarPedido, listarPedidos, marcarComoImpresso } from './lib/pedidos'
 import { listarClientesComResumo } from './lib/clientes'
 import { enviarParaImpressora, abrirWhatsAppPedido, formatBRL } from './lib/utils'
+import { supabase } from './lib/supabaseClient'
 
 import LojaView from './views/LojaView'
 import HomeView from './views/HomeView'
@@ -39,6 +40,21 @@ export default function App() {
       setProdutos(p)
       setLoading(false)
     })()
+  }, [])
+
+  // Verifica se já existe uma sessão de admin válida (ex: a pessoa
+  // recarregou a página depois de já ter logado) e mantém o app
+  // sincronizado caso a sessão expire ou seja encerrada em outra aba.
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setAdminAutenticado(!!data.session)
+    })
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAdminAutenticado(!!session)
+    })
+
+    return () => listener.subscription.unsubscribe()
   }, [])
 
   // Carrega pedidos e clientes só quando o admin autentica.
@@ -258,11 +274,11 @@ export default function App() {
             setTab={setAdminTab}
             voltar={() => setView('loja')}
             exportarCSV={exportarCSV}
-            sair={() => { setAdminAutenticado(false); setView('loja') }}
+            sair={async () => { await supabase.auth.signOut(); setView('loja') }}
           />
         ) : (
           <AdminLoginView
-            onSuccess={() => setAdminAutenticado(true)}
+            onSuccess={() => {}}
             voltar={() => setView('loja')}
           />
         )

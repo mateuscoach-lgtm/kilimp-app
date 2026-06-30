@@ -99,7 +99,8 @@ export async function listarPedidos() {
     .from('pedidos')
     .select(`
       id, numero_pedido, codigo_fiscal, endereco_entrega, forma_pagamento,
-      precisa_troco, troco_para, valor_frete, distancia_km, total, status, impresso, criado_em,
+      precisa_troco, troco_para, valor_frete, distancia_km, previsao_entrega,
+      total, status, impresso, criado_em,
       clientes ( id, nome, telefone ),
       itens_pedido ( nome_produto, unidade, quantidade, preco_unitario )
     `)
@@ -122,6 +123,7 @@ export async function listarPedidos() {
     trocoPara: p.troco_para,
     valorFrete: Number(p.valor_frete || 0),
     distanciaKm: p.distancia_km,
+    previsaoEntrega: p.previsao_entrega,
     itens: p.itens_pedido.map(i => ({
       nome: i.nome_produto, unidade: i.unidade, qty: i.quantidade, preco: Number(i.preco_unitario),
     })),
@@ -138,8 +140,19 @@ export async function marcarComoImpresso(pedidoDbId) {
   if (error) console.error('Erro ao marcar pedido como impresso:', error)
 }
 
-// Atualiza o status do pedido (Recebido → Em preparação → Saiu para entrega → Entregue).
+// Atualiza o status do pedido (Recebido → Embalando → Pronto para entrega → Finalizado).
 export async function atualizarStatusPedido(pedidoDbId, novoStatus) {
   const { error } = await supabase.from('pedidos').update({ status: novoStatus }).eq('id', pedidoDbId)
   if (error) console.error('Erro ao atualizar status do pedido:', error)
+}
+
+// Define ou altera a data prevista de entrega de um pedido (usado no
+// painel, aba Painel/Kanban). dataISO no formato "AAAA-MM-DD" ou null
+// para limpar a previsão.
+export async function atualizarPrevisaoEntrega(pedidoDbId, dataISO) {
+  const { error } = await supabase.from('pedidos').update({ previsao_entrega: dataISO || null }).eq('id', pedidoDbId)
+  if (error) {
+    console.error('Erro ao atualizar previsão de entrega:', error)
+    throw error
+  }
 }

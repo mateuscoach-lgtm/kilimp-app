@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react'
-import { ArrowRight, Hash, Phone, Package } from 'lucide-react'
+import { ArrowRight, Hash, Phone, Package, Calendar } from 'lucide-react'
 import { ACCENT_DARK, EmptyState } from '../components/Common'
 import { formatBRL } from '../lib/utils'
 import { atualizarStatusPedido } from '../lib/pedidos'
 import { useIsDesktop } from '../lib/useIsDesktop'
+import PedidoDetalheModal from './PedidoDetalheModal'
 
 // As 4 etapas do fluxo de preparação do pedido, na ordem em que avançam.
 // O texto de cada uma é exatamente o valor salvo na coluna "status" da
@@ -28,6 +29,7 @@ export default function KanbanView({ orders, recarregarPedidosEClientes }) {
   // na hora (otimista) mesmo enquanto o Supabase ainda está confirmando.
   const [movendo, setMovendo] = useState({}) // { [pedidoId]: novoStatus }
   const [arrastando, setArrastando] = useState(null) // pedido sendo arrastado
+  const [pedidoSelecionado, setPedidoSelecionado] = useState(null) // pedido aberto no modal de detalhe
 
   const pedidosPorColuna = useMemo(() => {
     const mapa = {}
@@ -70,83 +72,106 @@ export default function KanbanView({ orders, recarregarPedidosEClientes }) {
     return <EmptyState text="Nenhum pedido registrado ainda. Assim que um pedido chegar, ele aparece aqui como um card em 'Recebido'." />
   }
 
+  // Sempre que os pedidos são recarregados (ex: depois de salvar a
+  // previsão), refletimos a versão mais atual no modal aberto também,
+  // para o usuário ver a confirmação sem precisar fechar e reabrir.
+  const pedidoSelecionadoAtualizado = pedidoSelecionado
+    ? orders.find(o => o.id === pedidoSelecionado.id) || pedidoSelecionado
+    : null
+
   return (
-    <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8 }}>
-      {COLUNAS.map(coluna => {
-        const pedidosDaColuna = pedidosPorColuna[coluna.status] || []
-        return (
-          <div
-            key={coluna.status}
-            onDragOver={e => e.preventDefault()}
-            onDrop={e => handleDrop(e, coluna.status)}
-            style={{
-              flex: isDesktop ? '1 1 0' : '0 0 260px', minWidth: isDesktop ? 220 : 260,
-              display: 'flex', flexDirection: 'column',
-              background: '#F0F3F7', borderRadius: 14, minHeight: 200,
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 12px 10px' }}>
-              <span style={{ width: 9, height: 9, borderRadius: '50%', background: coluna.cor, flexShrink: 0 }} />
-              <span style={{ fontWeight: 700, fontSize: 12.5, color: '#33414F' }}>{coluna.titulo}</span>
-              <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 700, color: '#8B97A5', background: '#fff', borderRadius: 20, padding: '1px 8px' }}>
-                {pedidosDaColuna.length}
-              </span>
-            </div>
+    <>
+      <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8 }}>
+        {COLUNAS.map(coluna => {
+          const pedidosDaColuna = pedidosPorColuna[coluna.status] || []
+          return (
+            <div
+              key={coluna.status}
+              onDragOver={e => e.preventDefault()}
+              onDrop={e => handleDrop(e, coluna.status)}
+              style={{
+                flex: isDesktop ? '1 1 0' : '0 0 260px', minWidth: isDesktop ? 220 : 260,
+                display: 'flex', flexDirection: 'column',
+                background: '#F0F3F7', borderRadius: 14, minHeight: 200,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 12px 10px' }}>
+                <span style={{ width: 9, height: 9, borderRadius: '50%', background: coluna.cor, flexShrink: 0 }} />
+                <span style={{ fontWeight: 700, fontSize: 12.5, color: '#33414F' }}>{coluna.titulo}</span>
+                <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 700, color: '#8B97A5', background: '#fff', borderRadius: 20, padding: '1px 8px' }}>
+                  {pedidosDaColuna.length}
+                </span>
+              </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '0 10px 10px', flex: 1 }}>
-              {pedidosDaColuna.length === 0 && (
-                <div style={{ fontSize: 11.5, color: '#A9B3BE', textAlign: 'center', padding: '20px 8px', border: '1px dashed #D7DEE6', borderRadius: 10 }}>
-                  Nenhum pedido aqui
-                </div>
-              )}
-
-              {pedidosDaColuna.map(pedido => {
-                const destino = proximoStatus(coluna.status)
-                const emTransito = !!movendo[pedido.id]
-                return (
-                  <div
-                    key={pedido.id}
-                    draggable
-                    onDragStart={() => setArrastando(pedido)}
-                    onDragEnd={() => setArrastando(null)}
-                    style={{
-                      background: '#fff', borderRadius: 11, padding: 11, border: '1px solid #E3EAF3',
-                      cursor: 'grab', opacity: emTransito ? 0.55 : 1, transition: 'opacity 0.15s',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11.5, fontWeight: 700, color: ACCENT_DARK, marginBottom: 3 }}>
-                      <Hash size={11} /> {pedido.id}
-                    </div>
-                    <div style={{ fontSize: 12.5, fontWeight: 600, color: '#2C3E50' }}>{pedido.cliente}</div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#8B97A5', marginTop: 2 }}>
-                      <Phone size={10} /> {pedido.telefone}
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#8B97A5', marginTop: 4 }}>
-                      <Package size={10} /> {pedido.itens.reduce((s, i) => s + i.qty, 0)} itens
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
-                      <span style={{ fontWeight: 700, fontSize: 13, color: '#2C3E50' }}>{formatBRL(pedido.total)}</span>
-                      {destino && (
-                        <button
-                          onClick={() => moverPedido(pedido, destino)}
-                          disabled={emTransito}
-                          title={`Mover para "${destino}"`}
-                          style={{
-                            display: 'flex', alignItems: 'center', gap: 4, background: '#EAF1FB', color: ACCENT_DARK,
-                            border: 'none', borderRadius: 7, padding: '5px 8px', fontSize: 10.5, fontWeight: 700,
-                          }}
-                        >
-                          {emTransito ? '...' : 'Avançar'} <ArrowRight size={11} />
-                        </button>
-                      )}
-                    </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '0 10px 10px', flex: 1 }}>
+                {pedidosDaColuna.length === 0 && (
+                  <div style={{ fontSize: 11.5, color: '#A9B3BE', textAlign: 'center', padding: '20px 8px', border: '1px dashed #D7DEE6', borderRadius: 10 }}>
+                    Nenhum pedido aqui
                   </div>
-                )
-              })}
+                )}
+
+                {pedidosDaColuna.map(pedido => {
+                  const destino = proximoStatus(coluna.status)
+                  const emTransito = !!movendo[pedido.id]
+                  return (
+                    <div
+                      key={pedido.id}
+                      draggable
+                      onDragStart={() => setArrastando(pedido)}
+                      onDragEnd={() => setArrastando(null)}
+                      onClick={() => setPedidoSelecionado(pedido)}
+                      style={{
+                        background: '#fff', borderRadius: 11, padding: 11, border: '1px solid #E3EAF3',
+                        cursor: 'pointer', opacity: emTransito ? 0.55 : 1, transition: 'opacity 0.15s',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11.5, fontWeight: 700, color: ACCENT_DARK, marginBottom: 3 }}>
+                        <Hash size={11} /> {pedido.id}
+                      </div>
+                      <div style={{ fontSize: 12.5, fontWeight: 600, color: '#2C3E50' }}>{pedido.cliente}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#8B97A5', marginTop: 2 }}>
+                        <Phone size={10} /> {pedido.telefone}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#8B97A5', marginTop: 4 }}>
+                        <Package size={10} /> {pedido.itens.reduce((s, i) => s + i.qty, 0)} itens
+                      </div>
+                      {pedido.previsaoEntrega && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#1FAE5C', marginTop: 4, fontWeight: 600 }}>
+                          <Calendar size={10} /> {new Date(pedido.previsaoEntrega + 'T00:00:00').toLocaleDateString('pt-BR')}
+                        </div>
+                      )}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
+                        <span style={{ fontWeight: 700, fontSize: 13, color: '#2C3E50' }}>{formatBRL(pedido.total)}</span>
+                        {destino && (
+                          <button
+                            onClick={e => { e.stopPropagation(); moverPedido(pedido, destino) }}
+                            disabled={emTransito}
+                            title={`Mover para "${destino}"`}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: 4, background: '#EAF1FB', color: ACCENT_DARK,
+                              border: 'none', borderRadius: 7, padding: '5px 8px', fontSize: 10.5, fontWeight: 700,
+                            }}
+                          >
+                            {emTransito ? '...' : 'Avançar'} <ArrowRight size={11} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
-          </div>
-        )
-      })}
-    </div>
+          )
+        })}
+      </div>
+
+      {pedidoSelecionadoAtualizado && (
+        <PedidoDetalheModal
+          order={pedidoSelecionadoAtualizado}
+          onClose={() => setPedidoSelecionado(null)}
+          onAtualizado={recarregarPedidosEClientes}
+        />
+      )}
+    </>
   )
 }
