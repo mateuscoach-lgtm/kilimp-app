@@ -87,7 +87,7 @@ export default function LojaView({
             const qty = cart[prod.id] || 0
             return (
               <div key={prod.id} style={{ background: '#fff', borderRadius: 14, padding: isDesktop ? 16 : 12, border: '1px solid #ECE6D8', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <ProductThumb produto={prod} size={isDesktop ? 64 : 46} />
+                <ProductThumb produto={prod} size={isDesktop ? 64 : 46} height={isDesktop ? 140 : 110} />
                 <div style={{ fontSize: isDesktop ? 14.5 : 13.5, fontWeight: 600, lineHeight: 1.25, minHeight: 34, marginTop: 4, color: '#2C3E50' }}>{prod.nome}</div>
                 <div style={{ fontSize: 11.5, color: '#8A8273' }}>{prod.unidade}</div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>

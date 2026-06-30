@@ -133,6 +133,10 @@ export default function App() {
       setForm(prev => ({ ...prev, troco: false, trocoPara: '' }))
       setView('recibo')
     } catch (e) {
+      // O alerta para o cliente fica genérico de propósito (não é o lugar
+      // de mostrar jargão técnico), mas o erro real vai pro console (F12)
+      // para facilitar o diagnóstico de quem mexe no painel admin depois.
+      console.error('[Kilimp] Falha ao finalizar pedido:', e)
       alert('Não foi possível enviar o pedido. Verifique sua conexão e tente novamente.')
     }
   }

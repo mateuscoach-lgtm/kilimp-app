@@ -51,15 +51,23 @@ export function KilimpLogo({ size = 1, height = 40, variant = 'light', showTagli
   )
 }
 
-export function ProductThumb({ produto, size = 46 }) {
+export function ProductThumb({ produto, size = 46, height }) {
   if (produto.foto_url || produto.foto) {
     return (
-      <div style={{ width: '100%', height: size, borderRadius: 10, overflow: 'hidden', background: '#F0F4FA' }}>
-        <img src={produto.foto_url || produto.foto} alt={produto.nome} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      <div style={{ width: '100%', height: height || size, borderRadius: 10, overflow: 'hidden', background: '#F0F4FA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {/* object-fit "contain" em vez de "cover": mostra a foto do produto
+            inteira, sem cortar (ex: garrafas e embalagens de pé), mesmo que
+            sobre um respiro nas laterais. O fundo suave preenche esse espaço
+            de forma discreta, sem parecer vazio. */}
+        <img src={produto.foto_url || produto.foto} alt={produto.nome} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
       </div>
     )
   }
-  return <div style={{ fontSize: size * 0.65, lineHeight: 1 }}>{produto.emoji || '🧽'}</div>
+  return (
+    <div style={{ width: '100%', height: height || 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: size * 0.65, lineHeight: 1 }}>
+      {produto.emoji || '🧽'}
+    </div>
+  )
 }
 
 export function Section({ title, children }) {
