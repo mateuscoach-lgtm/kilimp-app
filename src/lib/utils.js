@@ -36,7 +36,13 @@ export function montarMensagemWhatsApp(order) {
 export function abrirWhatsAppPedido(order) {
   const texto = encodeURIComponent(montarMensagemWhatsApp(order))
   const url = `https://wa.me/${WHATSAPP_LOJA}?text=${texto}`
-  window.open(url, '_blank')
+  // Navegação direta em vez de window.open(url, '_blank'): evita que o
+  // navegador abra uma janela pop-up separada, que em alguns computadores
+  // (principalmente com posição/monitor salvos de uma sessão anterior)
+  // pode nascer fora da área visível da tela ("fora de área"). Com
+  // location.href o WhatsApp abre na mesma aba/contexto, de forma mais
+  // previsível tanto no computador quanto no celular.
+  window.location.href = url
 }
 
 // ============================================================
