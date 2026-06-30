@@ -32,10 +32,24 @@ export async function criarPedido({ dadosCliente, itensCarrinho, total, pagament
 
   const numeroPedido = await proximoNumeroPedido()
   const codigoFiscal = await proximoCodigoFiscal()
+  const agora = new Date().toISOString()
 
-  const { data: pedido, error: erroPedido } = await supabase
+  // Importante: NÃO usamos .select().single() no insert de pedidos.
+  // Desde que a leitura da tabela "pedidos" passou a exigir login
+  // (migração de segurança/LGPD), pedir para o Supabase devolver a
+  // linha recém-criada no mesmo insert falha com "new row violates
+  // row-level security policy" — porque quem está criando o pedido é o
+  // cliente comprando na loja, sem sessão logada: ele tem permissão de
+  // CRIAR pedidos, mas não de LER pedidos (nem o que ele mesmo acabou de
+  // criar). Em vez disso, geramos o id do pedido no próprio app (uuid),
+  // inserimos com esse id explícito, e usamos ele direto para vincular
+  // os itens — sem nunca precisar ler a tabela de volta.
+  const pedidoId = crypto.randomUUID()
+
+  const { error: erroPedido } = await supabase
     .from('pedidos')
     .insert({
+      id: pedidoId,
       numero_pedido: numeroPedido,
       codigo_fiscal: codigoFiscal,
       cliente_id: cliente.id,
@@ -45,12 +59,12 @@ export async function criarPedido({ dadosCliente, itensCarrinho, total, pagament
       troco_para: troco ? trocoPara : null,
       valor_frete: valorFrete || 0,
       distancia_km: distanciaKm ?? null,
+      previsao_entrega: null,
       total,
       status: 'Recebido',
       impresso: false,
+      criado_em: agora,
     })
-    .select()
-    .single()
 
   if (erroPedido) {
     console.error('Erro ao criar pedido:', erroPedido)
@@ -58,7 +72,7 @@ export async function criarPedido({ dadosCliente, itensCarrinho, total, pagament
   }
 
   const itensParaSalvar = itensCarrinho.map(item => ({
-    pedido_id: pedido.id,
+    pedido_id: pedidoId,
     produto_id: item.id,
     nome_produto: item.nome,
     unidade: item.unidade,
@@ -72,24 +86,31 @@ export async function criarPedido({ dadosCliente, itensCarrinho, total, pagament
     throw erroItens
   }
 
-  // Monta o objeto no mesmo formato usado pelas telas (recibo, admin etc.)
+  // Monta o objeto no mesmo formato usado pelas telas (recibo, admin
+  // etc.), usando os dados que o próprio app já tinha em mãos — sem
+  // reconsultar o banco, já que essa leitura seria bloqueada pela
+  // política de segurança para quem não está logado.
   return {
-    id: pedido.numero_pedido,
-    codigoFiscal: pedido.codigo_fiscal,
+    id: numeroPedido,
+    codigoFiscal,
     clienteId: cliente.id,
     cliente: cliente.nome,
     telefone: cliente.telefone,
-    endereco: pedido.endereco_entrega,
-    pagamento: pedido.forma_pagamento,
-    troco: pedido.precisa_troco,
-    trocoPara: pedido.troco_para,
-    valorFrete: Number(pedido.valor_frete || 0),
-    distanciaKm: pedido.distancia_km,
+    endereco: dadosCliente.enderecoCompleto,
+    pagamento,
+    troco: !!troco,
+    trocoPara: troco ? trocoPara : null,
+    valorFrete: Number(valorFrete || 0),
+    distanciaKm: distanciaKm ?? null,
+    previsaoEntrega: null,
     itens: itensCarrinho.map(i => ({ id: i.id, nome: i.nome, unidade: i.unidade, qty: i.qty, preco: i.preco })),
-    total: pedido.total,
-    status: pedido.status,
-    criadoEm: pedido.criado_em,
-    _dbId: pedido.id, // id interno (uuid) — útil para marcar como impresso depois
+    total,
+    status: 'Recebido',
+    criadoEm: agora,
+    // Não incluímos _dbId aqui de propósito: o cliente sem login não tem
+    // permissão de UPDATE em pedidos (marcar como impresso, por exemplo),
+    // então não faria sentido devolver um id para uma ação que vai falhar.
+    // O pedido já está salvo e visível normalmente no painel admin.
   }
 }
 

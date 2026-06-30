@@ -159,6 +159,12 @@ export default function App() {
 
   async function handleImprimirRecibo(order) {
     await enviarParaImpressora(order)
+    // order._dbId só existe quando o pedido foi criado/lido por uma sessão
+    // de admin logada (ex: reimpressão pelo painel). No fluxo normal do
+    // cliente comprando na loja (sem login), não temos esse uuid — e nem
+    // poderíamos marcar como impresso de qualquer forma, já que UPDATE em
+    // pedidos agora exige login. Por isso essa marcação é "melhor esforço":
+    // some silenciosamente quando não há sessão, sem travar o recibo.
     if (order._dbId) await marcarComoImpresso(order._dbId)
     abrirWhatsAppPedido(order)
   }
