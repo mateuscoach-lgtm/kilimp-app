@@ -229,6 +229,7 @@ export default function App() {
           setBusca={setBusca}
           cart={cart}
           addToCart={addToCart}
+          removeFromCart={removeFromCart}
           totalItens={totalItens}
           total={total}
           irParaCarrinho={() => setView('carrinho')}

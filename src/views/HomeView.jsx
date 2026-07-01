@@ -12,16 +12,22 @@ const SELOS = [
 ]
 
 // Ícones outline por palavra-chave da categoria — cai no genérico (Sparkles)
-// se o nome não corresponder a nenhum padrão conhecido.
+// se o nome não corresponder a nenhum padrão conhecido. Cada categoria
+// também ganha uma cor própria (não todas azul), para o grid de
+// categorias ter mais vida e ficar mais fácil de escanear visualmente.
 const ICONES_CATEGORIA = [
-  { match: /multiuso/i, icon: Sparkles },
-  { match: /desinfet/i, icon: Droplets },
-  { match: /detergente|sab[ãa]o/i, icon: FlaskConical },
-  { match: /sac/i, icon: Trash2 },
-  { match: /[áa]lcool/i, icon: FlaskConical },
-  { match: /papel/i, icon: PackageOpen },
-  { match: /lavanderia/i, icon: Droplets },
+  { match: /multiuso/i, icon: Sparkles, cor: '#7C5FC4' },
+  { match: /desinfet/i, icon: Droplets, cor: '#2980B9' },
+  { match: /detergente|sab[ãa]o/i, icon: FlaskConical, cor: '#E8960A' },
+  { match: /sac/i, icon: Trash2, cor: '#5A6470' },
+  { match: /[áa]lcool/i, icon: FlaskConical, cor: '#C9544A' },
+  { match: /papel/i, icon: PackageOpen, cor: '#1FAE5C' },
+  { match: /lavanderia/i, icon: Droplets, cor: '#1373D6' },
 ]
+function corPara(categoria) {
+  const found = ICONES_CATEGORIA.find(i => i.match.test(categoria))
+  return found ? found.cor : ACCENT_DARK
+}
 function iconePara(categoria) {
   const found = ICONES_CATEGORIA.find(i => i.match.test(categoria))
   return found ? found.icon : Sparkles
@@ -124,41 +130,61 @@ export default function HomeView({ categorias, totalItens, irParaProdutos, irPar
       {/* HERO */}
       <section id="topo" style={{
         background: `linear-gradient(160deg, ${ACCENT_DARK} 0%, ${ACCENT} 100%)`,
-        padding: isDesktop ? '60px 32px 52px' : '36px 20px 36px',
+        padding: isDesktop ? '64px 32px 56px' : '40px 20px 40px',
         textAlign: 'center', color: '#fff',
+        position: 'relative', overflow: 'hidden',
       }}>
-        <div style={{ maxWidth: 720, margin: '0 auto' }}>
-          <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
-            <KilimpLogo height={isDesktop ? 84 : 58} variant="light" showTagline />
+        {/* Gota d'água decorativa gigante — assinatura visual da marca,
+            ecoando o símbolo do logo, discreta ao fundo do hero. */}
+        <svg
+          width={isDesktop ? 420 : 260} height={isDesktop ? 560 : 340} viewBox="0 0 24 32"
+          style={{ position: 'absolute', right: isDesktop ? '-6%' : '-18%', top: '-8%', opacity: 0.08, pointerEvents: 'none' }}
+        >
+          <path d="M12 1C12 1 3 14 3 21a9 9 0 0018 0C21 14 12 1 12 1z" fill="#fff" />
+        </svg>
+        <svg
+          width={isDesktop ? 180 : 110} height={isDesktop ? 240 : 146} viewBox="0 0 24 32"
+          style={{ position: 'absolute', left: isDesktop ? '4%' : '-10%', bottom: '-10%', opacity: 0.06, pointerEvents: 'none' }}
+        >
+          <path d="M12 1C12 1 3 14 3 21a9 9 0 0018 0C21 14 12 1 12 1z" fill="#fff" />
+        </svg>
+
+        <div style={{ maxWidth: 720, margin: '0 auto', position: 'relative' }}>
+          <div style={{ marginBottom: 18, display: 'flex', justifyContent: 'center' }}>
+            <KilimpLogo height={isDesktop ? 88 : 60} variant="light" showTagline />
           </div>
           <p style={{
-            fontSize: isDesktop ? 16.5 : 14, color: 'rgba(255,255,255,0.88)',
-            maxWidth: 460, margin: '0 auto 26px', lineHeight: 1.5,
+            fontSize: isDesktop ? 17 : 14.5, color: 'rgba(255,255,255,0.90)', fontWeight: 500,
+            maxWidth: 460, margin: '0 auto 28px', lineHeight: 1.55,
           }}>
             Os melhores produtos de limpeza para facilitar o seu dia a dia, com entrega rápida em Sorocaba e região.
           </p>
           <button
             onClick={irParaProdutos}
             style={{
-              background: '#fff', color: ACCENT_DARK, border: 'none', borderRadius: 11,
-              padding: isDesktop ? '14px 34px' : '12px 28px', fontSize: 14, fontWeight: 700,
-              boxShadow: '0 8px 22px rgba(0,0,0,0.16)', cursor: 'pointer',
+              background: '#fff', color: ACCENT_DARK, border: 'none', borderRadius: 12,
+              padding: isDesktop ? '15px 38px' : '13px 30px', fontSize: 14.5, fontWeight: 800,
+              boxShadow: '0 10px 28px rgba(0,0,0,0.20)', cursor: 'pointer', letterSpacing: 0.2,
+              transition: 'transform 0.15s',
             }}
+            onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+            onMouseLeave={e => e.currentTarget.style.transform = 'none'}
           >
             Ver Produtos
           </button>
 
           <div style={{
             display: 'grid', gridTemplateColumns: isDesktop ? 'repeat(4, 1fr)' : 'repeat(2, 1fr)',
-            gap: isDesktop ? 26 : 16, marginTop: isDesktop ? 48 : 32,
+            gap: isDesktop ? 28 : 18, marginTop: isDesktop ? 52 : 36,
           }}>
             {SELOS.map(s => (
-              <div key={s.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+              <div key={s.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 9 }}>
                 <div style={{
-                  width: 44, height: 44, borderRadius: '50%', border: '1.5px solid rgba(255,255,255,0.38)',
+                  width: 46, height: 46, borderRadius: '50%', background: 'rgba(255,255,255,0.12)',
+                  border: '1.5px solid rgba(255,255,255,0.30)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <s.icon size={19} color="#fff" />
+                  <s.icon size={19} color="#fff" strokeWidth={1.8} />
                 </div>
                 <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.2 }}>{s.label}</span>
               </div>
@@ -167,34 +193,37 @@ export default function HomeView({ categorias, totalItens, irParaProdutos, irPar
         </div>
       </section>
 
-      {/* CATEGORIAS — fundo areia, ícones outline */}
+      {/* CATEGORIAS — fundo areia, ícones outline com cor própria por categoria */}
       {categoriasReais.length > 0 && (
-        <section id="categorias" style={{ background: SAND, padding: isDesktop ? '48px 32px' : '32px 20px' }}>
+        <section id="categorias" style={{ background: SAND, padding: isDesktop ? '52px 32px' : '36px 20px' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
             <Eyebrow>Nosso catálogo</Eyebrow>
-            <h2 style={{ fontSize: isDesktop ? 26 : 19, fontWeight: 800, color: ACCENT_DARK, marginBottom: 22, marginTop: 6 }}>
+            <h2 style={{ fontSize: isDesktop ? 27 : 20, fontWeight: 800, color: ACCENT_DARK, marginBottom: 24, marginTop: 6, letterSpacing: -0.4 }}>
               Categorias de produtos
             </h2>
             <div style={{
               display: 'grid',
               gridTemplateColumns: isDesktop ? `repeat(${Math.min(categoriasReais.length, 5)}, 1fr)` : 'repeat(2, 1fr)',
-              gap: 12,
+              gap: 13,
             }}>
               {categoriasReais.map(cat => {
                 const Icone = iconePara(cat)
+                const cor = corPara(cat)
                 return (
                   <button
                     key={cat}
                     onClick={irParaProdutos}
                     style={{
-                      background: '#fff', border: '1px solid #E7E2D5', borderRadius: 13,
-                      padding: '20px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
-                      cursor: 'pointer', transition: 'transform 0.15s, box-shadow 0.15s',
+                      background: '#fff', border: '1px solid #E7E2D5', borderRadius: 14,
+                      padding: '22px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 11,
+                      cursor: 'pointer', transition: 'transform 0.15s, box-shadow 0.15s, border-color 0.15s',
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 16px rgba(26,82,118,0.10)' }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none' }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = `0 10px 22px ${cor}22`; e.currentTarget.style.borderColor = `${cor}55` }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#E7E2D5' }}
                   >
-                    <Icone size={26} color={ACCENT_DARK} strokeWidth={1.5} />
+                    <div style={{ width: 46, height: 46, borderRadius: 12, background: `${cor}16`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Icone size={22} color={cor} strokeWidth={1.8} />
+                    </div>
                     <span style={{ fontSize: 12.5, fontWeight: 700, color: GRAPHITE, textAlign: 'center' }}>{cat}</span>
                   </button>
                 )
