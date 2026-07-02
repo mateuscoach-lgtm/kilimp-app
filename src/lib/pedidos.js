@@ -27,7 +27,7 @@ async function proximoCodigoFiscal() {
 // Cria o pedido completo: garante o cliente, cria o pedido, cria os itens.
 // Devolve o pedido já no formato que o restante do app espera (igual ao
 // que era usado no protótipo, para não precisar mudar as telas).
-export async function criarPedido({ dadosCliente, itensCarrinho, total, pagamento, troco, trocoPara, valorFrete, distanciaKm }) {
+export async function criarPedido({ dadosCliente, itensCarrinho, total, pagamento, troco, trocoPara, valorFrete, distanciaKm, observacao }) {
   const cliente = await garantirCliente(dadosCliente)
 
   const numeroPedido = await proximoNumeroPedido()
@@ -60,6 +60,7 @@ export async function criarPedido({ dadosCliente, itensCarrinho, total, pagament
       valor_frete: valorFrete || 0,
       distancia_km: distanciaKm ?? null,
       previsao_entrega: null,
+      observacao: observacao || null,
       total,
       status: 'Recebido',
       impresso: false,
@@ -120,7 +121,7 @@ export async function listarPedidos() {
     .from('pedidos')
     .select(`
       id, numero_pedido, codigo_fiscal, endereco_entrega, forma_pagamento,
-      precisa_troco, troco_para, valor_frete, distancia_km, previsao_entrega,
+      precisa_troco, troco_para, valor_frete, distancia_km, previsao_entrega, observacao,
       total, status, impresso, criado_em,
       clientes ( id, nome, telefone ),
       itens_pedido ( nome_produto, unidade, quantidade, preco_unitario )
@@ -145,6 +146,7 @@ export async function listarPedidos() {
     valorFrete: Number(p.valor_frete || 0),
     distanciaKm: p.distancia_km,
     previsaoEntrega: p.previsao_entrega,
+    observacao: p.observacao || null,
     itens: p.itens_pedido.map(i => ({
       nome: i.nome_produto, unidade: i.unidade, qty: i.quantidade, preco: Number(i.preco_unitario),
     })),

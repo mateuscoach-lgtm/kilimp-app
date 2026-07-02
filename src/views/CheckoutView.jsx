@@ -213,6 +213,19 @@ export default function CheckoutView({ form, setForm, items, total, voltar, fina
               </div>
             )}
           </Step>
+
+          <Step number={4} title="Observações (opcional)" icon={Receipt}>
+            <div>
+              <label style={{ fontSize: 11.5, color: '#7C8B9C', marginBottom: 4, display: 'block' }}>Deixe um recado para a entrega</label>
+              <textarea
+                value={form.observacao || ''}
+                onChange={e => update('observacao', e.target.value)}
+                placeholder="Ex: Deixar na portaria, tocar interfone 201, não subir escadas..."
+                rows={3}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1.5px solid #E2E8F0', fontSize: 13, outline: 'none', resize: 'vertical', fontFamily: 'inherit' }}
+              />
+            </div>
+          </Step>
         </div>
 
         {/* Resumo — sticky no desktop */}

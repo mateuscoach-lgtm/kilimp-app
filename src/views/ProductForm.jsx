@@ -9,6 +9,7 @@ export default function ProductForm({ produto, onCancel, onSave, salvando }) {
     nome: produto.nome || '',
     categoria: produto.categoria || '',
     preco: produto.preco ?? '',
+    custo: produto.custo ?? '',
     unidade: produto.unidade || '',
     estoque: produto.estoque ?? '',
     foto_url: produto.foto_url || null,
@@ -43,6 +44,7 @@ export default function ProductForm({ produto, onCancel, onSave, salvando }) {
       {
         ...data,
         preco: parseFloat(data.preco),
+        custo: data.custo !== '' ? parseFloat(String(data.custo).replace(',', '.')) : null,
         estoque: data.estoque === '' ? 0 : parseInt(data.estoque, 10),
       },
       arquivoFoto
@@ -101,10 +103,21 @@ export default function ProductForm({ produto, onCancel, onSave, salvando }) {
           <Field label="Unidade" value={data.unidade} onChange={v => update('unidade', v)} placeholder="Ex: 1L, 500ml, pacote c/10" />
           <div style={{ display: 'flex', gap: 10 }}>
             <div style={{ flex: 1 }}>
-              <Field label="Preço (R$)" value={data.preco} onChange={v => update('preco', v.replace(',', '.'))} placeholder="0,00" />
+              <Field label="Preço de venda (R$)" value={data.preco} onChange={v => update('preco', v.replace(',', '.'))} placeholder="0,00" />
             </div>
             <div style={{ flex: 1 }}>
               <Field label="Estoque" value={data.estoque} onChange={v => update('estoque', v)} placeholder="0" />
+            </div>
+          </div>
+          <div>
+            <Field label="Custo do produto (R$) — opcional" value={data.custo} onChange={v => update('custo', v.replace(',', '.'))} placeholder="0,00" />
+            {data.custo !== '' && data.preco !== '' && !isNaN(parseFloat(data.custo)) && !isNaN(parseFloat(data.preco)) && (
+              <div style={{ marginTop: 6, fontSize: 11.5, color: '#1FAE5C', background: '#EAFBF0', borderRadius: 8, padding: '6px 10px', fontWeight: 600 }}>
+                Margem de contribuição: {(((parseFloat(data.preco) - parseFloat(data.custo)) / parseFloat(data.preco)) * 100).toFixed(1)}% — Lucro bruto: R$ {(parseFloat(data.preco) - parseFloat(data.custo)).toFixed(2).replace('.', ',')}
+              </div>
+            )}
+            <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 5 }}>
+              Usado no relatório de vendas para calcular margem e contribuição por produto.
             </div>
           </div>
         </Section>
