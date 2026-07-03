@@ -32,18 +32,18 @@ export default function LojaView({
 
       {/* ── HEADER ── */}
       <div style={{
-        background: ACCENT_DARK,
+        background: `linear-gradient(135deg, #060E3A 0%, ${ACCENT_DARK} 100%)`,
         padding: isDesktop ? '0 32px' : '0 16px',
-        boxShadow: '0 2px 12px rgba(26,82,118,0.22)',
+        boxShadow: '0 2px 16px rgba(6,14,58,0.40)',
         position: 'sticky', top: 0, zIndex: 40,
       }}>
-        <div style={{ maxWidth: 1180, margin: '0 auto', display: 'flex', alignItems: 'center', gap: isDesktop ? 20 : 12, height: isDesktop ? 64 : 56 }}>
+        <div style={{ maxWidth: 1180, margin: '0 auto', display: 'flex', alignItems: 'center', gap: isDesktop ? 20 : 12, height: isDesktop ? 76 : 66 }}>
           {irParaHome && (
-            <button onClick={irParaHome} style={{ background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: 10, width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0, cursor: 'pointer' }}>
+            <button onClick={irParaHome} style={{ background: 'rgba(255,255,255,0.10)', border: 'none', borderRadius: 10, width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0, cursor: 'pointer' }}>
               <ArrowLeft size={16} />
             </button>
           )}
-          <KilimpLogo height={isDesktop ? 28 : 23} variant="light" />
+          <KilimpLogo height={isDesktop ? 58 : 50} />
 
           {/* busca inline no desktop */}
           {isDesktop && (
@@ -188,19 +188,20 @@ export default function LojaView({
 
       {/* ── BOTÃO FLUTUANTE DO CARRINHO ── */}
       {totalItens > 0 && (
-        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'center', padding: '12px 16px 16px', background: `linear-gradient(to top, ${BG} 55%, rgba(250,247,240,0))`, pointerEvents: 'none' }}>
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'center', padding: '12px 16px 16px', background: `linear-gradient(to top, ${BG} 55%, rgba(245,247,255,0))`, pointerEvents: 'none' }}>
           <button
             onClick={irParaCarrinho}
             style={{
               width: '100%', maxWidth: isDesktop ? 480 : 488,
-              background: ACCENT_DARK, color: '#fff', border: 'none', borderRadius: 16,
+              background: `linear-gradient(135deg, #C9A84C 0%, #E8C96A 50%, #C9A84C 100%)`,
+              color: '#0D1F6E', border: 'none', borderRadius: 16,
               padding: '15px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              boxShadow: '0 8px 24px rgba(26,82,118,0.40)', fontSize: 15, fontWeight: 800,
+              boxShadow: '0 8px 28px rgba(201,168,76,0.50)', fontSize: 15, fontWeight: 800,
               cursor: 'pointer', pointerEvents: 'all',
             }}
           >
             <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ background: 'rgba(255,255,255,0.18)', borderRadius: 8, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ background: 'rgba(13,31,110,0.15)', borderRadius: 8, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <ShoppingCart size={16} />
               </span>
               {totalItens} {totalItens === 1 ? 'item' : 'itens'}

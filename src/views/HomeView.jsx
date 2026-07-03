@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { ShoppingCart, Menu, X, ShieldCheck, Lock, Truck, MessageCircle, Mail, MapPin, Phone, Droplets, FlaskConical, Trash2, Sparkles, PackageOpen } from 'lucide-react'
-import { ACCENT, ACCENT_DARK, SAND, BG, GRAPHITE, KilimpLogo } from '../components/Common'
+import { ACCENT, ACCENT_DARK, ACCENT_CYAN, GOLD, GOLD_LIGHT, SAND, BG, GRAPHITE, KilimpLogo } from '../components/Common'
 import { useIsDesktop } from '../lib/useIsDesktop'
 import { WHATSAPP_LOJA } from '../lib/utils'
 
@@ -62,13 +62,13 @@ export default function HomeView({ categorias, totalItens, irParaProdutos, irPar
     <div style={{ minHeight: '100vh', background: BG, color: GRAPHITE }}>
 
       {/* HEADER — azul sólido, consistente com o restante do app */}
-      <header style={{ position: 'sticky', top: 0, zIndex: 50, background: ACCENT_DARK, boxShadow: '0 2px 10px rgba(26,82,118,0.18)' }}>
+      <header style={{ position: 'sticky', top: 0, zIndex: 50, background: `linear-gradient(135deg, #060E3A 0%, ${ACCENT_DARK} 100%)`, boxShadow: '0 2px 16px rgba(6,14,58,0.45)' }}>
         <div style={{
-          maxWidth: 1180, margin: '0 auto', padding: isDesktop ? '13px 32px' : '11px 16px',
+          maxWidth: 1180, margin: '0 auto', padding: isDesktop ? '10px 32px' : '8px 16px',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
-          <button onClick={() => scrollPara('topo')} style={{ background: 'none', border: 'none', padding: 0, display: 'flex' }}>
-            <KilimpLogo height={isDesktop ? 30 : 25} variant="light" />
+          <button onClick={() => scrollPara('topo')} style={{ background: 'none', border: 'none', padding: 0, display: 'flex', cursor: 'pointer' }}>
+            <KilimpLogo height={isDesktop ? 56 : 48} />
           </button>
 
           {isDesktop ? (
@@ -129,48 +129,64 @@ export default function HomeView({ categorias, totalItens, irParaProdutos, irPar
 
       {/* HERO */}
       <section id="topo" style={{
-        background: `linear-gradient(160deg, ${ACCENT_DARK} 0%, ${ACCENT} 100%)`,
-        padding: isDesktop ? '64px 32px 56px' : '40px 20px 40px',
+        background: `linear-gradient(160deg, #060E3A 0%, ${ACCENT_DARK} 45%, #1A3A9C 100%)`,
+        padding: isDesktop ? '64px 32px 56px' : '36px 20px 36px',
         textAlign: 'center', color: '#fff',
         position: 'relative', overflow: 'hidden',
       }}>
-        {/* Gota d'água decorativa gigante — assinatura visual da marca,
-            ecoando o símbolo do logo, discreta ao fundo do hero. */}
-        <svg
-          width={isDesktop ? 420 : 260} height={isDesktop ? 560 : 340} viewBox="0 0 24 32"
-          style={{ position: 'absolute', right: isDesktop ? '-6%' : '-18%', top: '-8%', opacity: 0.08, pointerEvents: 'none' }}
-        >
-          <path d="M12 1C12 1 3 14 3 21a9 9 0 0018 0C21 14 12 1 12 1z" fill="#fff" />
+        <style>{`
+          @keyframes floatDrop { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-12px) scale(1.08)} }
+          @keyframes floatDrop2 { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-8px) scale(1.05)} }
+          @keyframes shimmer { 0%{opacity:0.12} 50%{opacity:0.22} 100%{opacity:0.12} }
+          .drop1{animation:floatDrop 3.5s ease-in-out infinite}
+          .drop2{animation:floatDrop2 4.2s ease-in-out infinite 0.8s}
+          .drop3{animation:floatDrop 5s ease-in-out infinite 1.6s}
+          .gold-line{background:linear-gradient(90deg,transparent,${GOLD},transparent);height:1px;margin:16px auto;max-width:320px}
+        `}</style>
+
+        {/* Gotas decorativas animadas — espelhando as gotas da logo */}
+        <svg className="drop1" width={isDesktop ? 80 : 50} height={isDesktop ? 107 : 67} viewBox="0 0 24 32"
+          style={{ position: 'absolute', right: isDesktop ? '8%' : '4%', top: '10%', pointerEvents: 'none', filter: 'drop-shadow(0 0 8px #4A9FE066)' }}>
+          <path d="M12 1C12 1 3 14 3 21a9 9 0 0018 0C21 14 12 1 12 1z" fill={ACCENT_CYAN} opacity={0.75} />
+          <path d="M8 18 Q12 14 16 18" stroke="rgba(255,255,255,0.6)" strokeWidth="1.5" fill="none" />
         </svg>
-        <svg
-          width={isDesktop ? 180 : 110} height={isDesktop ? 240 : 146} viewBox="0 0 24 32"
-          style={{ position: 'absolute', left: isDesktop ? '4%' : '-10%', bottom: '-10%', opacity: 0.06, pointerEvents: 'none' }}
-        >
-          <path d="M12 1C12 1 3 14 3 21a9 9 0 0018 0C21 14 12 1 12 1z" fill="#fff" />
+        <svg className="drop2" width={isDesktop ? 48 : 30} height={isDesktop ? 64 : 40} viewBox="0 0 24 32"
+          style={{ position: 'absolute', right: isDesktop ? '12%' : '14%', top: '40%', pointerEvents: 'none', filter: 'drop-shadow(0 0 6px #4A9FE055)' }}>
+          <path d="M12 1C12 1 3 14 3 21a9 9 0 0018 0C21 14 12 1 12 1z" fill={ACCENT_CYAN} opacity={0.55} />
+        </svg>
+        <svg className="drop3" width={isDesktop ? 36 : 22} height={isDesktop ? 48 : 30} viewBox="0 0 24 32"
+          style={{ position: 'absolute', left: isDesktop ? '6%' : '3%', bottom: '20%', pointerEvents: 'none', filter: 'drop-shadow(0 0 5px #4A9FE044)' }}>
+          <path d="M12 1C12 1 3 14 3 21a9 9 0 0018 0C21 14 12 1 12 1z" fill={ACCENT_CYAN} opacity={0.45} />
         </svg>
 
         <div style={{ maxWidth: 720, margin: '0 auto', position: 'relative' }}>
-          <div style={{ marginBottom: 18, display: 'flex', justifyContent: 'center' }}>
-            <KilimpLogo height={isDesktop ? 88 : 60} variant="light" showTagline />
+          {/* Logo real da empresa no hero */}
+          <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'center' }}>
+            <KilimpLogo height={isDesktop ? 180 : 130} maxWidth={isDesktop ? 520 : 340} />
           </div>
+
+          {/* Separador dourado */}
+          <div className="gold-line" />
+
           <p style={{
-            fontSize: isDesktop ? 17 : 14.5, color: 'rgba(255,255,255,0.90)', fontWeight: 500,
-            maxWidth: 460, margin: '0 auto 28px', lineHeight: 1.55,
+            fontSize: isDesktop ? 16.5 : 14, color: 'rgba(255,255,255,0.88)', fontWeight: 500,
+            maxWidth: 460, margin: '16px auto 28px', lineHeight: 1.6,
           }}>
-            Os melhores produtos de limpeza para facilitar o seu dia a dia, com entrega rápida em Sorocaba e região.
+            Entrega rápida de produtos de limpeza em Sorocaba e região.
           </p>
           <button
             onClick={irParaProdutos}
             style={{
-              background: '#fff', color: ACCENT_DARK, border: 'none', borderRadius: 12,
-              padding: isDesktop ? '15px 38px' : '13px 30px', fontSize: 14.5, fontWeight: 800,
-              boxShadow: '0 10px 28px rgba(0,0,0,0.20)', cursor: 'pointer', letterSpacing: 0.2,
-              transition: 'transform 0.15s',
+              background: `linear-gradient(135deg, ${GOLD} 0%, ${GOLD_LIGHT} 50%, ${GOLD} 100%)`,
+              color: '#0D1F6E', border: 'none', borderRadius: 12,
+              padding: isDesktop ? '15px 42px' : '13px 32px', fontSize: 15, fontWeight: 800,
+              boxShadow: `0 6px 24px rgba(201,168,76,0.45)`, cursor: 'pointer', letterSpacing: 0.3,
+              transition: 'transform 0.15s, box-shadow 0.15s',
             }}
-            onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-            onMouseLeave={e => e.currentTarget.style.transform = 'none'}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 10px 32px rgba(201,168,76,0.55)` }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = `0 6px 24px rgba(201,168,76,0.45)` }}
           >
-            Ver Produtos
+            ✨ Ver Produtos
           </button>
 
           <div style={{
@@ -180,20 +196,21 @@ export default function HomeView({ categorias, totalItens, irParaProdutos, irPar
             {SELOS.map(s => (
               <div key={s.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 9 }}>
                 <div style={{
-                  width: 46, height: 46, borderRadius: '50%', background: 'rgba(255,255,255,0.12)',
-                  border: '1.5px solid rgba(255,255,255,0.30)',
+                  width: 48, height: 48, borderRadius: '50%',
+                  background: 'rgba(74,159,224,0.15)',
+                  border: `1.5px solid rgba(74,159,224,0.40)`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <s.icon size={19} color="#fff" strokeWidth={1.8} />
+                  <s.icon size={20} color={ACCENT_CYAN} strokeWidth={1.8} />
                 </div>
-                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.2 }}>{s.label}</span>
+                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.3, color: 'rgba(255,255,255,0.92)' }}>{s.label}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CATEGORIAS — fundo areia, ícones outline com cor própria por categoria */}
+      {/* CATEGORIAS */}
       {categoriasReais.length > 0 && (
         <section id="categorias" style={{ background: SAND, padding: isDesktop ? '52px 32px' : '36px 20px' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
@@ -214,14 +231,14 @@ export default function HomeView({ categorias, totalItens, irParaProdutos, irPar
                     key={cat}
                     onClick={irParaProdutos}
                     style={{
-                      background: '#fff', border: '1px solid #E7E2D5', borderRadius: 14,
+                      background: '#fff', border: `1px solid #E2E8F8`, borderRadius: 14,
                       padding: '22px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 11,
-                      cursor: 'pointer', transition: 'transform 0.15s, box-shadow 0.15s, border-color 0.15s',
+                      cursor: 'pointer', transition: 'transform 0.18s, box-shadow 0.18s, border-color 0.18s',
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = `0 10px 22px ${cor}22`; e.currentTarget.style.borderColor = `${cor}55` }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#E7E2D5' }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = `0 10px 24px ${cor}28`; e.currentTarget.style.borderColor = `${cor}66` }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#E2E8F8' }}
                   >
-                    <div style={{ width: 46, height: 46, borderRadius: 12, background: `${cor}16`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: 48, height: 48, borderRadius: 13, background: `${cor}18`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <Icone size={22} color={cor} strokeWidth={1.8} />
                     </div>
                     <span style={{ fontSize: 12.5, fontWeight: 700, color: GRAPHITE, textAlign: 'center' }}>{cat}</span>
@@ -237,10 +254,16 @@ export default function HomeView({ categorias, totalItens, irParaProdutos, irPar
       <section id="sobre" style={{ padding: isDesktop ? '60px 32px' : '40px 20px', background: BG }}>
         <div style={{ maxWidth: 880, margin: '0 auto', textAlign: 'center' }}>
           <Eyebrow center>Quem somos</Eyebrow>
-          <h2 style={{ fontSize: isDesktop ? 26 : 19, fontWeight: 800, color: ACCENT_DARK, margin: '6px 0 14px' }}>
-            Qualidade, confiança e praticidade para o seu dia a dia
+          <h2 style={{ fontSize: isDesktop ? 26 : 19, fontWeight: 800, color: ACCENT_DARK, margin: '6px 0 10px', letterSpacing: -0.3 }}>
+            Qualidade, confiança e praticidade
           </h2>
-          <p style={{ fontSize: isDesktop ? 15 : 13.5, color: '#5A6470', lineHeight: 1.7, maxWidth: 620, margin: '0 auto' }}>
+          {/* Separador dourado — elemento da identidade Kilimp */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 16 }}>
+            <div style={{ height: 1, flex: 1, maxWidth: 80, background: `linear-gradient(to right, transparent, ${GOLD})` }} />
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: GOLD }} />
+            <div style={{ height: 1, flex: 1, maxWidth: 80, background: `linear-gradient(to left, transparent, ${GOLD})` }} />
+          </div>
+          <p style={{ fontSize: isDesktop ? 15 : 13.5, color: '#4A5470', lineHeight: 1.7, maxWidth: 620, margin: '0 auto' }}>
             A Kilimp é uma empresa de Sorocaba dedicada ao comércio de produtos de limpeza,
             com atendimento próximo e entrega rápida para sua casa ou empresa. Trabalhamos
             para que cuidar do seu lar seja simples, rápido e sem complicação.
@@ -249,14 +272,14 @@ export default function HomeView({ categorias, totalItens, irParaProdutos, irPar
       </section>
 
       {/* FOOTER INSTITUCIONAL */}
-      <footer id="contato" style={{ background: ACCENT_DARK, color: '#fff', padding: isDesktop ? '44px 32px 26px' : '32px 20px 22px' }}>
+      <footer id="contato" style={{ background: `linear-gradient(160deg, #060E3A 0%, ${ACCENT_DARK} 100%)`, color: '#fff', padding: isDesktop ? '44px 32px 26px' : '32px 20px 22px' }}>
         <div style={{
           maxWidth: 1100, margin: '0 auto',
           display: 'grid', gridTemplateColumns: isDesktop ? '1.2fr 1fr 1fr' : '1fr', gap: 28,
         }}>
           <div>
-            <KilimpLogo height={30} variant="light" />
-            <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.72)', marginTop: 14, lineHeight: 1.6, maxWidth: 280 }}>
+            <KilimpLogo height={isDesktop ? 72 : 60} />
+            <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.65)', marginTop: 14, lineHeight: 1.6, maxWidth: 280 }}>
               Comércio de produtos de limpeza em Sorocaba e região. Qualidade, confiança e praticidade para o seu dia a dia.
             </p>
           </div>
@@ -276,8 +299,9 @@ export default function HomeView({ categorias, totalItens, irParaProdutos, irPar
         </div>
 
         <div style={{
-          maxWidth: 1100, margin: '32px auto 0', paddingTop: 18, borderTop: '1px solid rgba(255,255,255,0.15)',
-          fontSize: 11, color: 'rgba(255,255,255,0.5)', textAlign: 'center',
+          maxWidth: 1100, margin: '32px auto 0', paddingTop: 18,
+          borderTop: '1px solid rgba(201,168,76,0.25)',
+          fontSize: 11, color: 'rgba(255,255,255,0.40)', textAlign: 'center',
         }}>
           © {new Date().getFullYear()} Kilimp · Comércio de Produtos de Limpeza
         </div>
