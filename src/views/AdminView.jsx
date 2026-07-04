@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { ClipboardList, Package, Store, FileSpreadsheet, Plus, Pencil, Trash2, Hash, LogOut, ArrowLeft, Printer, Eye, Kanban } from 'lucide-react'
+import { ClipboardList, Package, Store, FileSpreadsheet, Plus, Pencil, Trash2, Hash, LogOut, ArrowLeft, Printer, Eye } from 'lucide-react'
 import { ACCENT_DARK, DANGER, ProductThumb, StatCard, EmptyState } from '../components/Common'
 import { formatBRL } from '../lib/utils'
 import { criarProduto, atualizarProduto, desativarProduto } from '../lib/produtos'
@@ -7,8 +7,6 @@ import { useIsDesktop } from '../lib/useIsDesktop'
 import ProductForm from './ProductForm'
 import ReciboModal from './ReciboModal'
 import ClienteModal from './ClienteModal'
-import KanbanView from './KanbanView'
-import RelatorioView from './RelatorioView'
 
 export default function AdminView({
   orders, clients, produtos, recarregarProdutos, recarregarPedidosEClientes,
@@ -16,7 +14,7 @@ export default function AdminView({
 }) {
   const isDesktop = useIsDesktop()
   const maxWidth = isDesktop ? 1000 : 560
-  const [editing, setEditing] = useState(null) // produto sendo editado, ou {} para novo
+  const [editing, setEditing] = useState(null)
   const [salvando, setSalvando] = useState(false)
   const [atualizando, setAtualizando] = useState(false)
   const [pedidoParaImprimir, setPedidoParaImprimir] = useState(null)
@@ -82,7 +80,6 @@ export default function AdminView({
 
       <div style={{ display: 'flex', gap: 8, padding: '12px 16px 0', overflowX: 'auto' }}>
         {[
-          { key: 'painel', label: 'Painel', icon: Kanban },
           { key: 'pedidos', label: 'Pedidos', icon: ClipboardList },
           { key: 'produtos', label: 'Produtos', icon: Package },
           { key: 'clientes', label: 'Clientes', icon: Store },
@@ -111,7 +108,7 @@ export default function AdminView({
           <StatCard label="Ticket médio" value={formatBRL(ticketMedio)} small />
         </div>
 
-        {(tab === 'painel' || tab === 'pedidos' || tab === 'clientes') && (
+        {(tab === 'pedidos' || tab === 'clientes') && (
           <button
             onClick={handleAtualizar}
             disabled={atualizando}
@@ -119,10 +116,6 @@ export default function AdminView({
           >
             {atualizando ? 'Atualizando...' : '↻ Atualizar lista'}
           </button>
-        )}
-
-        {tab === 'painel' && (
-          <KanbanView orders={orders} recarregarPedidosEClientes={recarregarPedidosEClientes} />
         )}
 
         {tab === 'pedidos' && (
@@ -143,11 +136,6 @@ export default function AdminView({
                   )}
                   <div style={{ fontSize: 12.5, color: '#4A5C70' }}>{o.cliente} • {o.telefone}</div>
                   <div style={{ fontSize: 11.5, color: '#7C8B9C', marginTop: 2 }}>{o.endereco}</div>
-                  {o.observacao && (
-                    <div style={{ fontSize: 11.5, color: '#D98C2B', background: '#FDF6EC', borderRadius: 7, padding: '5px 9px', marginTop: 6, fontStyle: 'italic' }}>
-                      📝 {o.observacao}
-                    </div>
-                  )}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8, fontSize: 13 }}>
                     <span style={{ color: '#7C8B9C' }}>
                       {o.itens.reduce((s, i) => s + i.qty, 0)} itens • {o.pagamento}
@@ -224,11 +212,32 @@ export default function AdminView({
         )}
 
         {tab === 'relatorio' && (
-          <RelatorioView
-            orders={orders}
-            produtos={produtos}
-            exportarCSV={exportarCSV}
-          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ background: '#fff', border: '1px solid #E3EAF3', borderRadius: 12, padding: 14 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#7C8B9C', textTransform: 'uppercase', marginBottom: 10 }}>Produtos mais vendidos</div>
+              {vendasPorProduto.length === 0 ? (
+                <div style={{ fontSize: 12.5, color: '#9AAAB9' }}>Sem dados ainda.</div>
+              ) : (
+                vendasPorProduto.map(([nome, qty]) => (
+                  <div key={nome} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, padding: '5px 0', borderBottom: '1px solid #EEF2F7' }}>
+                    <span>{nome}</span>
+                    <span style={{ fontWeight: 700, color: ACCENT_DARK }}>{qty} un.</span>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <button
+              onClick={exportarCSV}
+              disabled={orders.length === 0}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: orders.length === 0 ? '#C7D6E8' : ACCENT_DARK, color: '#fff', border: 'none', borderRadius: 12, padding: '13px 0', fontSize: 13.5, fontWeight: 700 }}
+            >
+              <FileSpreadsheet size={16} /> Exportar relatório (CSV / Excel)
+            </button>
+            <div style={{ fontSize: 11.5, color: '#9AAAB9', textAlign: 'center' }}>
+              Gera um arquivo .csv que abre direto no Excel, com todos os pedidos carregados.
+            </div>
+          </div>
         )}
       </div>
 

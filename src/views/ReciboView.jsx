@@ -4,7 +4,7 @@ import { ACCENT, ACCENT_DARK, Row, Dashed } from '../components/Common'
 import { formatBRL, abrirWhatsAppPedido } from '../lib/utils'
 
 export default function ReciboView({ order, onImprimir, novoPedido }) {
-  const [status, setStatus] = useState('idle') // idle | imprimindo | impresso
+  const [status, setStatus] = useState('idle')
 
   async function handleImprimir() {
     setStatus('imprimindo')

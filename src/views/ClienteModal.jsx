@@ -3,9 +3,6 @@ import { X, Printer } from 'lucide-react'
 import { ACCENT_DARK, Row, Dashed } from '../components/Common'
 import { formatBRL } from '../lib/utils'
 
-// Modal que mostra os dados completos de um cliente (cadastro + resumo de
-// compras) e permite imprimir essa ficha — útil para consulta rápida ou
-// para conferência manual.
 export default function ClienteModal({ cliente, pedidosDoCliente, onClose }) {
   function handleImprimir() {
     window.print()

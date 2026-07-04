@@ -1,34 +1,19 @@
 import React, { useState } from 'react'
-import { Lock, Mail, Loader2 } from 'lucide-react'
+import { Lock, User } from 'lucide-react'
 import { ACCENT_DARK, DANGER } from '../components/Common'
-import { supabase } from '../lib/supabaseClient'
+import { ADMIN_CREDENCIAIS } from '../lib/utils'
 
 export default function AdminLoginView({ onSuccess, voltar }) {
-  const [email, setEmail] = useState('')
+  const [usuario, setUsuario] = useState('')
   const [senha, setSenha] = useState('')
-  const [erro, setErro] = useState('')
-  const [entrando, setEntrando] = useState(false)
+  const [erro, setErro] = useState(false)
 
-  async function handleSubmit() {
-    if (!email.trim() || !senha) return
-    setEntrando(true)
-    setErro('')
-
-    // Login real via Supabase Auth (substitui o usuário/senha fixos que
-    // existiam antes). O usuário precisa ter sido criado previamente em
-    // Authentication → Users no painel do Supabase — ver
-    // supabase_migracao_auth_seguranca.sql para o passo a passo.
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password: senha,
-    })
-
-    setEntrando(false)
-
-    if (error) {
-      setErro('E-mail ou senha incorretos.')
-    } else {
+  function handleSubmit() {
+    if (usuario.trim() === ADMIN_CREDENCIAIS.usuario && senha === ADMIN_CREDENCIAIS.senha) {
+      setErro(false)
       onSuccess()
+    } else {
+      setErro(true)
     }
   }
 
@@ -44,13 +29,11 @@ export default function AdminLoginView({ onSuccess, voltar }) {
 
       <div style={{ background: '#fff', border: '1px solid #E3EAF3', borderRadius: 14, padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
         <div>
-          <label style={{ fontSize: 11.5, color: '#7C8B9C', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 5 }}><Mail size={12} /> E-mail</label>
+          <label style={{ fontSize: 11.5, color: '#7C8B9C', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 5 }}><User size={12} /> Usuário</label>
           <input
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
+            value={usuario}
+            onChange={e => setUsuario(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-            placeholder="admin@kilimp.com.br"
             style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1px solid #D7E2F0', fontSize: 13.5, outline: 'none' }}
           />
         </div>
@@ -64,14 +47,9 @@ export default function AdminLoginView({ onSuccess, voltar }) {
             style={{ width: '100%', padding: '10px 12px', borderRadius: 9, border: '1px solid #D7E2F0', fontSize: 13.5, outline: 'none' }}
           />
         </div>
-        {erro && <div style={{ fontSize: 12, color: DANGER }}>{erro}</div>}
-        <button
-          onClick={handleSubmit}
-          disabled={entrando}
-          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: ACCENT_DARK, color: '#fff', border: 'none', borderRadius: 10, padding: '11px 0', fontSize: 13.5, fontWeight: 700, marginTop: 4, opacity: entrando ? 0.7 : 1 }}
-        >
-          {entrando && <Loader2 size={14} className="spin" />}
-          {entrando ? 'Entrando...' : 'Entrar'}
+        {erro && <div style={{ fontSize: 12, color: DANGER }}>Usuário ou senha incorretos.</div>}
+        <button onClick={handleSubmit} style={{ width: '100%', background: ACCENT_DARK, color: '#fff', border: 'none', borderRadius: 10, padding: '11px 0', fontSize: 13.5, fontWeight: 700, marginTop: 4 }}>
+          Entrar
         </button>
       </div>
 

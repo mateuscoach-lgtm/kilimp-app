@@ -4,23 +4,19 @@ Aplicativo de pedidos de produtos de limpeza da Kilimp — catálogo, carrinho,
 checkout, recibo com impressão térmica + WhatsApp, e painel administrativo
 (pedidos, produtos com foto, clientes, relatório exportável para Excel).
 
-Este projeto já está conectado ao **Supabase** (banco de dados real) em vez
-do armazenamento de teste usado no protótipo inicial.
+Este projeto já está conectado ao **Supabase** (banco de dados real).
 
 ## Antes de rodar: configurar o Supabase
 
-1. Siga o **Guia de Deploy Kilimp (Supabase + Netlify)** — Capítulos 1 a 4 —
-   para criar o projeto no Supabase e pegar a URL + chave anon.
+1. Crie o projeto no Supabase e pegue a URL + chave anon (Project Settings → API).
 2. No SQL Editor do Supabase, cole e execute o conteúdo do arquivo
    `supabase_setup.sql` (está na raiz deste projeto). Ele já cria as 4
    tabelas, as sequências de numeração, as funções `nextval_pedido` /
    `nextval_fiscal` e as regras de segurança (RLS).
-3. Em **Storage**, crie um bucket chamado `produtos-fotos`, marcado como
-   público (também descrito no guia, Capítulo 3).
+3. Em **Storage**, crie um bucket chamado `produtos-fotos`, marcado como público.
 4. (Opcional) Cole e execute o `supabase_produtos_exemplo.sql` para
-   começar com 12 produtos de exemplo já cadastrados, em vez de abrir
-   o catálogo vazio. Veja o passo a passo bem detalhado em
-   `COMO_CADASTRAR_PRODUTOS.md`.
+   começar com 12 produtos de exemplo já cadastrados. Veja o passo a
+   passo em `COMO_CADASTRAR_PRODUTOS.md`.
 
 ## Rodando localmente
 
@@ -32,18 +28,14 @@ npm install
 cp .env.example .env
 
 # 3. Editar o .env e colar sua URL e chave do Supabase
-#    (abra o arquivo .env em qualquer editor de texto)
 
 # 4. Rodar o servidor de desenvolvimento
 npm run dev
 ```
 
-O terminal vai mostrar um endereço local (geralmente `http://localhost:5173`)
-para abrir no navegador.
+O terminal vai mostrar um endereço local (geralmente `http://localhost:5173`).
 
 ## Publicando no Netlify
-
-Siga os Capítulos 6 e 7 do Guia de Deploy. Resumo:
 
 1. Suba este código para um repositório no GitHub.
 2. No Netlify, importe o repositório.
@@ -61,101 +53,59 @@ Essas credenciais estão em `src/lib/utils.js` (constante `ADMIN_CREDENCIAIS`).
 **Troque a senha antes de divulgar o app**, editando esse arquivo.
 
 > Nota de segurança: este login protege apenas a *tela* do painel. Para uma
-> proteção mais forte (que protege também o acesso direto à API do
-> Supabase), o passo seguinte de evolução é migrar para o Supabase Auth.
-> Isso não é urgente para o volume inicial de uma loja de bairro, mas vale
-> revisitar se o app crescer.
+> proteção mais forte, o passo seguinte de evolução é migrar para o
+> Supabase Auth.
 
-## Nova página de recepção (Home) e identidade visual
+## Identidade visual — logo Kilimp
 
-O app agora abre numa página institucional (`src/views/HomeView.jsx`) antes
-da loja: cabeçalho **azul sólido** com menu (Início, Produtos, Categorias,
-Sobre Nós, Contato, Painel Administrativo, Carrinho), hero com a logo e CTA
-"Ver Produtos", seção de categorias com ícones outline sobre fundo areia,
-seção "Sobre Nós" e rodapé azul institucional com contatos.
+A logo "Kilimp" é tipografia real (componente `KilimpLogo` em
+`src/components/Common.jsx`), não uma imagem — assim ela se adapta a
+qualquer fundo (azul ou claro), escala sem perda de qualidade e não gera
+o "estranhamento" visual de um PNG colado sobre a interface.
 
-**A logo "Kilimp" foi recriada como tipografia real** (componente
-`KilimpLogo` em `src/components/Common.jsx`), não como arquivo de imagem —
-isso permite que ela se adapte a qualquer fundo (azul ou claro) sem nunca
-aparecer como um "retângulo colado". Usa a fonte Poppins (carregada via
-Google Fonts no `index.html`) em itálico-bold, com uma gota SVG ao lado.
+Ela reproduz o estilo do logo oficial de 20 anos da marca: letras
+arredondadas tipo "bubble", gradiente + bisel 3D via `text-shadow` em
+camadas, leve arco na linha de base, pontos customizados (bolhas) nos
+dois "i", e uma gota com gradiente/brilho ao lado do "p". A fonte usada é
+a **Fredoka One** (Google Fonts, carregada no `index.html`), a mais
+próxima livre disponível do estilo do logo original — se a marca tiver o
+arquivo da fonte/letreiro original, dá pra ficar ainda mais fiel.
 
-Para trocar o texto/estilo da logo, edite a função `KilimpLogo` em
-`Common.jsx`. O parâmetro `variant` controla a cor: `"light"` (branco, para
-fundos azuis) ou `"dark"` (azul escuro, para fundos claros).
+Para ajustar o logo, edite a função `KilimpLogo` em `Common.jsx`. O
+parâmetro `variant` controla a cor: `"light"` (para fundos azuis) ou
+`"dark"` (para fundos claros/areia).
 
 **Paleta de cores** (em `src/components/Common.jsx`):
 - Azul principal `#2980B9` (`ACCENT`) e azul escuro `#1A5276` (`ACCENT_DARK`)
-- Areia `#F4F1EA` (`SAND`) — fundo de seções alternadas (categorias)
-- Areia clara `#FAF7F0` (`BG`) — fundo principal da loja e da Home
+- Areia `#F4F1EA` (`SAND`) — fundo de seções alternadas
+- Areia clara `#FAF7F0` (`BG`) — fundo principal
 - Grafite `#2C3E50` (`GRAPHITE`) — textos, no lugar do preto puro
 
-Para editar o e-mail e texto de localização exibidos no rodapé, veja as
-constantes `EMAIL_LOJA` e `ENDERECO_LOJA_TEXTO` no topo de `HomeView.jsx`
-(mesmos valores também existem em `ContactFooter.jsx`, usado dentro da loja).
+## Reconhecimento automático de cliente recorrente
 
+Ao digitar o telefone no checkout e sair do campo, o app busca no banco e,
+se encontrar, pré-preenche nome, endereço, complemento, bairro e cidade.
 
-
-O checkout agora reconhece automaticamente clientes que já compraram antes:
-ao digitar o telefone e sair do campo, o app busca no banco e, se encontrar,
-pré-preenche nome, endereço, complemento, bairro e cidade — sem precisar de
-login ou senha. Da segunda compra em diante, o cliente só digita o telefone.
-
-Também foi adicionado o campo **Complemento** (bloco, apartamento, ponto de
-referência), útil para quem mora em condomínio.
-
-**Migração de banco necessária:** se você já rodou o `supabase_setup.sql`
-antes desta atualização, rode também `supabase_migracao_complemento.sql`
-(adiciona a coluna nova na tabela `clientes`, sem apagar nada).
-
-
+## Cálculo de frete por distância
 
 O checkout calcula automaticamente o valor da entrega com base na distância
-em linha reta entre a loja e o endereço do cliente (sem custo, sem chave de
-API — usa o serviço gratuito Nominatim/OpenStreetMap para localizar o
-endereço, e a fórmula de Haversine para calcular a distância).
+em linha reta entre a loja e o endereço do cliente (Nominatim/OpenStreetMap
++ fórmula de Haversine, sem custo).
 
-**Antes de usar em produção, configure em `src/lib/frete.js`:**
+Antes de usar em produção, configure em `src/lib/frete.js`:
 
 1. `LOJA_LATITUDE` e `LOJA_LONGITUDE` — a localização real da Kilimp.
-   Forma fácil de achar: abra o Google Maps, clique com o botão direito
-   exatamente no ponto da loja, e copie os dois números que aparecem.
-2. `FAIXAS_FRETE` — a tabela de preço por faixa de distância. Vem com
-   valores de exemplo; edite livremente.
-
-**Migração de banco necessária:** se você já rodou o `supabase_setup.sql`
-antes desta atualização, é preciso rodar também o
-`supabase_migracao_frete.sql` (adiciona duas colunas novas na tabela
-`pedidos`, sem apagar nada do que já existe).
+2. `FAIXAS_FRETE` — a tabela de preço por faixa de distância.
 
 Se o endereço não for encontrado automaticamente, o cliente pode optar por
-"Combinar na entrega" em vez de travar o pedido.
+"Combinar na entrega".
 
-## Reimpressão e ficha de cliente (novo)
+## Reimpressão e ficha de cliente
 
-No painel admin, aba **Pedidos**, cada pedido tem um botão **"Reimprimir"**
-que reabre o cupom completo e permite reenviar para a impressora/WhatsApp.
+No painel admin, aba **Pedidos**, cada pedido tem um botão **"Reimprimir"**.
+Na aba **Clientes**, cada cliente tem **"Consultar / imprimir ficha"**.
 
-Na aba **Clientes**, cada cliente tem um botão **"Consultar / imprimir
-ficha"**, que mostra os dados completos e o histórico de pedidos, com opção
-de imprimir.
-
-## Rodapé de contatos (novo)
-
-A tela inicial (loja) agora tem, no final da página, três botões de
-contato: WhatsApp, e-mail e localização no mapa. Edite os valores reais em
-`src/components/ContactFooter.jsx` (constantes `EMAIL_LOJA` e
-`ENDERECO_LOJA_TEXTO`).
-
-
-
-As telas principais (loja, carrinho, checkout, painel admin) agora se
-adaptam automaticamente para telas grandes — mais colunas de produtos,
-cabeçalho mais espaçoso, formulários mais largos. Isso é feito por CSS
-(hook `useIsDesktop` em `src/lib/useIsDesktop.js`), sem precisar de uma
-versão separada do app.
-
-
+## Estrutura de pastas
 
 ```
 src/
@@ -169,14 +119,18 @@ src/
     useIsDesktop.js      → hook para detectar tela grande (computador) vs celular
   views/
     LojaView.jsx        → catálogo (tela inicial do cliente)
+    HomeView.jsx         → página institucional de recepção
     CarrinhoView.jsx    → carrinho de compras
     CheckoutView.jsx    → dados de entrega, pagamento, troco
-    ReciboView.jsx      → comprovante + botão de imprimir/WhatsApp
+    ReciboView.jsx       → comprovante + botão de imprimir/WhatsApp
+    ReciboModal.jsx      → reimpressão de pedido (painel admin)
+    ClienteModal.jsx     → ficha do cliente (painel admin)
     AdminLoginView.jsx  → login do painel
     AdminView.jsx       → painel: pedidos, produtos, clientes, relatório
     ProductForm.jsx     → cadastro/edição de produto com foto
   components/
-    Common.jsx          → peças visuais reaproveitadas (botões, cards, etc.)
+    Common.jsx           → peças visuais reaproveitadas (logo, botões, cards, etc.)
+    ContactFooter.jsx    → rodapé de contato (loja)
   App.jsx                → tela principal, navegação entre as views
   main.jsx                → ponto de entrada do React
 supabase_setup.sql        → script completo para colar no SQL Editor do Supabase
@@ -185,14 +139,13 @@ supabase_setup.sql        → script completo para colar no SQL Editor do Supaba
 
 ## O que ainda depende de uma etapa futura
 
-- **Impressão térmica automática**: a função `enviarParaImpressora` em
+- **Impressão térmica automática**: `enviarParaImpressora` em
   `src/lib/utils.js` já monta o comando ESC/POS, mas só simula o envio
   (loga no console). Falta o agente local de impressão rodando no
-  computador da loja — ver Capítulo 10 do Guia de Deploy.
-- **Pix automático (Mercado Pago)**: a tela de checkout já avisa o cliente
-  que o Pix é combinado na entrega. Para automatizar, é necessária uma
-  Edge Function no Supabase — ver Capítulo 9 do Guia de Deploy.
+  computador da loja.
+- **Pix automático (Mercado Pago)**: hoje o Pix é combinado na entrega.
+  Automatizar exige uma Edge Function no Supabase.
 - **WhatsApp 100% automático**: hoje o botão "Imprimir e avisar loja" abre
   o WhatsApp com a mensagem pronta, mas alguém precisa clicar em enviar.
-  Automatizar de ponta a ponta exigiria a API oficial do WhatsApp Business
-  (custo e processo de aprovação mais longos — não recomendado por agora).
+- **Nota fiscal eletrônica (NF-e)**: em avaliação — ver conversa em andamento
+  sobre integração com provedor de emissão (Focus NFe / PlugNotas).

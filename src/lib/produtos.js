@@ -4,8 +4,6 @@ import { supabase } from './supabaseClient'
 // PRODUTOS
 // ============================================================
 
-// Busca todos os produtos ativos, para exibir na loja.
-// No painel admin, passamos incluirInativos=true para também ver os ocultos.
 export async function listarProdutos(incluirInativos = false) {
   let query = supabase.from('produtos').select('*').order('nome')
   if (!incluirInativos) query = query.eq('ativo', true)
@@ -18,8 +16,6 @@ export async function listarProdutos(incluirInativos = false) {
   return data
 }
 
-// Cria um novo produto. Se vier um arquivo de foto (File do input), faz o
-// upload para o Storage primeiro e salva o link público em foto_url.
 export async function criarProduto(produto, arquivoFoto) {
   let fotoUrl = null
   if (arquivoFoto) {
@@ -32,7 +28,6 @@ export async function criarProduto(produto, arquivoFoto) {
       nome: produto.nome,
       categoria: produto.categoria,
       preco: produto.preco,
-      custo: produto.custo ?? null,
       unidade: produto.unidade,
       estoque: produto.estoque || 0,
       foto_url: fotoUrl,
@@ -48,7 +43,6 @@ export async function criarProduto(produto, arquivoFoto) {
   return data
 }
 
-// Atualiza um produto existente. Se vier um novo arquivo de foto, substitui.
 export async function atualizarProduto(id, produto, arquivoFoto) {
   let fotoUrl = produto.foto_url || null
   if (arquivoFoto) {
@@ -61,7 +55,6 @@ export async function atualizarProduto(id, produto, arquivoFoto) {
       nome: produto.nome,
       categoria: produto.categoria,
       preco: produto.preco,
-      custo: produto.custo ?? null,
       unidade: produto.unidade,
       estoque: produto.estoque || 0,
       foto_url: fotoUrl,
@@ -77,8 +70,6 @@ export async function atualizarProduto(id, produto, arquivoFoto) {
   return data
 }
 
-// Exclusão "lógica": marca como inativo em vez de apagar de verdade.
-// Isso preserva o histórico de pedidos antigos que referenciam esse produto.
 export async function desativarProduto(id) {
   const { error } = await supabase.from('produtos').update({ ativo: false }).eq('id', id)
   if (error) {
@@ -87,7 +78,6 @@ export async function desativarProduto(id) {
   }
 }
 
-// Envia o arquivo de foto para o bucket "produtos-fotos" e devolve a URL pública.
 async function enviarFotoProduto(arquivoFoto) {
   const extensao = arquivoFoto.name.split('.').pop()
   const nomeArquivo = `produto-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extensao}`

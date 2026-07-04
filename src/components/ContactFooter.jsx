@@ -2,11 +2,8 @@ import React from 'react'
 import { MessageCircle, Mail, MapPin } from 'lucide-react'
 import { WHATSAPP_LOJA } from '../lib/utils'
 
-// Edite estes três valores com os dados reais de contato da Kilimp.
 const EMAIL_LOJA = 'contato@kilimp.com.br'
-const ENDERECO_LOJA_TEXTO = 'Sorocaba, SP' // texto mostrado e usado na busca do mapa
-// Se já souber a latitude/longitude exatas da loja (mesmas usadas em frete.js),
-// pode usar elas aqui para o link abrir o ponto exato em vez de buscar pelo texto.
+const ENDERECO_LOJA_TEXTO = 'Sorocaba, SP'
 
 export default function ContactFooter({ isDesktop }) {
   function abrirWhatsApp() {

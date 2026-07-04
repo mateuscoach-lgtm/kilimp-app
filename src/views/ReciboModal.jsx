@@ -3,9 +3,6 @@ import { X, Printer } from 'lucide-react'
 import { ACCENT, ACCENT_DARK, Row, Dashed } from '../components/Common'
 import { formatBRL, abrirWhatsAppPedido, enviarParaImpressora } from '../lib/utils'
 
-// Modal simples que mostra o cupom de um pedido já existente, com botão
-// para reimprimir (reenvia o comando ESC/POS e reabre o WhatsApp, igual
-// faz a tela de recibo do cliente). Usado pelo painel admin, aba Pedidos.
 export default function ReciboModal({ order, onClose }) {
   const [status, setStatus] = useState('idle')
 

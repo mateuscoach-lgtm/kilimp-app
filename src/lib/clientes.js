@@ -1,12 +1,11 @@
 import { supabase } from './supabaseClient'
 
-// Busca um cliente pelo telefone (usado para saber se é cliente novo ou recorrente).
 export async function buscarClientePorTelefone(telefone) {
   const { data, error } = await supabase
     .from('clientes')
     .select('*')
     .eq('telefone', telefone)
-    .maybeSingle() // não dá erro se não encontrar nenhum
+    .maybeSingle()
 
   if (error) {
     console.error('Erro ao buscar cliente:', error)
@@ -15,7 +14,6 @@ export async function buscarClientePorTelefone(telefone) {
   return data
 }
 
-// Cria um cliente novo.
 export async function criarCliente(dados) {
   const { data, error } = await supabase
     .from('clientes')
@@ -37,8 +35,6 @@ export async function criarCliente(dados) {
   return data
 }
 
-// Atualiza os dados de um cliente já existente (ex: ele mudou de endereço
-// ou corrigiu o nome numa compra seguinte). Mantém o telefone como chave.
 export async function atualizarCliente(id, dados) {
   const { data, error } = await supabase
     .from('clientes')
@@ -60,16 +56,12 @@ export async function atualizarCliente(id, dados) {
   return data
 }
 
-// Garante que o cliente existe: se já tiver cadastro pelo telefone, atualiza
-// os dados (caso tenham mudado) e retorna; senão, cria um novo.
 export async function garantirCliente(dados) {
   const existente = await buscarClientePorTelefone(dados.telefone)
   if (existente) return atualizarCliente(existente.id, dados)
   return criarCliente(dados)
 }
 
-// Lista todos os clientes, já trazendo quantos pedidos cada um fez e o total gasto
-// (usado na aba "Clientes" do painel admin).
 export async function listarClientesComResumo() {
   const { data: clientes, error: erroClientes } = await supabase
     .from('clientes')
